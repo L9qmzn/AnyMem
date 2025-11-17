@@ -1,6 +1,9 @@
 package parser
 
 import (
+	"unicode"
+	"unicode/utf8"
+
 	gast "github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
@@ -9,6 +12,22 @@ import (
 )
 
 type tagParser struct{}
+
+// decodeRune decodes the first rune from a byte slice and returns it with its size.
+// Returns (0, 0) if the slice is empty or contains invalid UTF-8.
+func decodeRune(b []byte) (rune, int) {
+	if len(b) == 0 {
+		return 0, 0
+	}
+
+	// Decode UTF-8
+	r, size := utf8.DecodeRune(b)
+	if r == utf8.RuneError && size == 1 {
+		// Invalid UTF-8
+		return 0, 0
+	}
+	return r, size
+}
 
 // NewTagParser creates a new inline parser for #tag syntax.
 func NewTagParser() parser.InlineParser {
@@ -45,21 +64,26 @@ func (*tagParser) Parse(_ gast.Node, block text.Reader, _ parser.Context) gast.N
 	}
 
 	// Scan tag characters
-	// Valid: alphanumeric, dash, underscore, forward slash
+	// Valid: Unicode letters, numbers, dash, underscore, forward slash
 	tagEnd := 1 // Start after #
 	for tagEnd < len(line) {
-		c := line[tagEnd]
+		// Convert byte sequence to rune for Unicode support
+		r, size := decodeRune(line[tagEnd:])
+		if size == 0 {
+			break
+		}
 
-		isValid := (c >= 'a' && c <= 'z') ||
-			(c >= 'A' && c <= 'Z') ||
-			(c >= '0' && c <= '9') ||
-			c == '-' || c == '_' || c == '/'
+		// Check if character is valid for tags
+		// Valid: Unicode letters, numbers, dash, underscore, forward slash
+		isValid := unicode.IsLetter(r) ||
+			unicode.IsNumber(r) ||
+			r == '-' || r == '_' || r == '/'
 
 		if !isValid {
 			break
 		}
 
-		tagEnd++
+		tagEnd += size
 	}
 
 	// Must have at least one character after #

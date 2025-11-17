@@ -12,18 +12,22 @@ import { visit } from "unist-util-visit";
  *   #2024_plans → <span class="tag" data-tag="2024_plans">#2024_plans</span>
  *   #work-notes → <span class="tag" data-tag="work-notes">#work-notes</span>
  *   #tag1/subtag/subtag2 → <span class="tag" data-tag="tag1/subtag/subtag2">#tag1/subtag/subtag2</span>
+ *   #中文标签 → <span class="tag" data-tag="中文标签">#中文标签</span>
+ *   #日本語 → <span class="tag" data-tag="日本語">#日本語</span>
  *
  * Rules:
- * - Tag must start with # followed by alphanumeric, underscore, hyphen, or forward slash
+ * - Tag must start with # followed by Unicode letters, numbers, underscore, hyphen, or forward slash
+ * - Supports Chinese, Japanese, Korean, and other Unicode languages
  * - Tag ends at whitespace, punctuation (except -, _, /), or end of line
  * - Tags at start of line after ## are headings, not tags
  */
 
 /**
  * Check if character is valid for tag content
+ * Supports Unicode letters (including Chinese, Japanese, etc.), numbers, underscore, hyphen, and slash
  */
 function isTagChar(char: string): boolean {
-  return /[a-zA-Z0-9_\-/]/.test(char);
+  return /[\p{L}\p{N}_\-/]/u.test(char);
 }
 
 /**

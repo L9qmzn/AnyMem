@@ -126,6 +126,66 @@ func TestTagParser(t *testing.T) {
 			expectedTag: "work-log/2024/q1",
 			shouldParse: true,
 		},
+		{
+			name:        "chinese tag",
+			input:       "#中文标签",
+			expectedTag: "中文标签",
+			shouldParse: true,
+		},
+		{
+			name:        "chinese tag followed by space",
+			input:       "#中文 ",
+			expectedTag: "中文",
+			shouldParse: true,
+		},
+		{
+			name:        "chinese tag followed by punctuation",
+			input:       "#工作。",
+			expectedTag: "工作",
+			shouldParse: true,
+		},
+		{
+			name:        "japanese tag",
+			input:       "#日本語",
+			expectedTag: "日本語",
+			shouldParse: true,
+		},
+		{
+			name:        "korean tag",
+			input:       "#한국어",
+			expectedTag: "한국어",
+			shouldParse: true,
+		},
+		{
+			name:        "mixed chinese and english tag",
+			input:       "#工作notes",
+			expectedTag: "工作notes",
+			shouldParse: true,
+		},
+		{
+			name:        "chinese tag with numbers",
+			input:       "#项目2024",
+			expectedTag: "项目2024",
+			shouldParse: true,
+		},
+		{
+			name:        "chinese hierarchical tag",
+			input:       "#项目/开发/前端",
+			expectedTag: "项目/开发/前端",
+			shouldParse: true,
+		},
+		{
+			name:        "chinese tag with underscore",
+			input:       "#工作_笔记",
+			expectedTag: "工作_笔记",
+			shouldParse: true,
+		},
+		{
+			name:        "chinese tag with hyphen",
+			input:       "#项目-管理",
+			expectedTag: "项目-管理",
+			shouldParse: true,
+		},
 	}
 
 	for _, tt := range tests {
