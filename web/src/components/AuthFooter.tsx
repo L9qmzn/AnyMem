@@ -9,10 +9,18 @@ interface Props {
 }
 
 const AuthFooter = observer(({ className }: Props) => {
+  const handleLocaleChange = (locale: string) => {
+    instanceStore.state.setPartial({ locale });
+  };
+
+  const handleThemeChange = (theme: string) => {
+    instanceStore.state.setPartial({ theme });
+  };
+
   return (
     <div className={cn("mt-4 flex flex-row items-center justify-center w-full gap-2", className)}>
-      <LocaleSelect value={instanceStore.state.locale} onChange={(locale) => instanceStore.state.setPartial({ locale })} />
-      <ThemeSelect value={instanceStore.state.theme} onValueChange={(theme) => instanceStore.state.setPartial({ theme })} />
+      <LocaleSelect value={instanceStore.state.locale} onChange={handleLocaleChange} />
+      <ThemeSelect value={instanceStore.state.theme} onValueChange={handleThemeChange} />
     </div>
   );
 });

@@ -321,7 +321,7 @@ export const initialUserStore = async () => {
     const { user: currentUser } = await authServiceClient.getCurrentSession({});
 
     if (!currentUser) {
-      // No authenticated user - clear state and use default locale
+      // No authenticated user - clear state and use browser language
       userStore.state.setPartial({
         currentUser: undefined,
         userGeneralSetting: undefined,
@@ -355,11 +355,11 @@ export const initialUserStore = async () => {
     if (generalSetting) {
       // Note: setPartial will validate theme automatically
       instanceStore.state.setPartial({
-        locale: generalSetting.locale,
+        locale: generalSetting.locale || findNearestMatchedLanguage(navigator.language),
         theme: generalSetting.theme || "default", // Validation handled by setPartial
       });
     } else {
-      // Fallback if settings weren't loaded
+      // Fallback if settings weren't loaded - use browser language
       const locale = findNearestMatchedLanguage(navigator.language);
       instanceStore.state.setPartial({ locale });
     }

@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import { autorun } from "mobx";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router-dom";
@@ -54,17 +55,21 @@ const App = observer(() => {
     link.href = instanceGeneralSetting.customProfile.logoUrl || "/logo.webp";
   }, [instanceGeneralSetting.customProfile]);
 
+  // Observe locale changes and update i18n using MobX autorun
   useEffect(() => {
-    const currentLocale = instanceStore.state.locale;
-    // This will trigger re-rendering of the whole app.
-    i18n.changeLanguage(currentLocale);
-    document.documentElement.setAttribute("lang", currentLocale);
-    if (["ar", "fa"].includes(currentLocale)) {
-      document.documentElement.setAttribute("dir", "rtl");
-    } else {
-      document.documentElement.setAttribute("dir", "ltr");
-    }
-  }, [instanceStore.state.locale]);
+    const dispose = autorun(() => {
+      const currentLocale = instanceStore.state.locale;
+      // This will trigger re-rendering of the whole app.
+      i18n.changeLanguage(currentLocale);
+      document.documentElement.setAttribute("lang", currentLocale);
+      if (["ar", "fa"].includes(currentLocale)) {
+        document.documentElement.setAttribute("dir", "rtl");
+      } else {
+        document.documentElement.setAttribute("dir", "ltr");
+      }
+    });
+    return dispose;
+  }, [i18n]);
 
   useEffect(() => {
     if (!userGeneralSetting) {
@@ -77,32 +82,34 @@ const App = observer(() => {
     });
   }, [userGeneralSetting?.locale, userGeneralSetting?.theme]);
 
-  // Load theme when instance theme changes or user setting changes
+  // Load theme when it changes using MobX autorun
   useEffect(() => {
-    const currentTheme = userGeneralSetting?.theme || instanceStore.state.theme;
-    if (currentTheme) {
-      loadTheme(currentTheme);
-    }
-  }, [userGeneralSetting?.theme, instanceStore.state.theme]);
+    const dispose = autorun(() => {
+      const currentTheme = userGeneralSetting?.theme || instanceStore.state.theme;
+      if (currentTheme) {
+        loadTheme(currentTheme);
+      }
+    });
+    return dispose;
+  }, [userGeneralSetting?.theme]);
 
   // Listen for system theme changes when using "system" theme
   useEffect(() => {
-    const currentTheme = userGeneralSetting?.theme || instanceStore.state.theme;
+    const dispose = autorun(() => {
+      const currentTheme = userGeneralSetting?.theme || instanceStore.state.theme;
+      // Only set up listener if theme is "system"
+      if (currentTheme !== "system") {
+        return;
+      }
 
-    // Only set up listener if theme is "system"
-    if (currentTheme !== "system") {
-      return;
-    }
-
-    // Set up listener for OS theme preference changes
-    const cleanup = setupSystemThemeListener(() => {
-      // Reload theme when system preference changes
-      loadTheme(currentTheme);
+      // Set up listener for OS theme preference changes
+      return setupSystemThemeListener(() => {
+        // Reload theme when system preference changes
+        loadTheme(currentTheme);
+      });
     });
-
-    // Cleanup listener on unmount or when theme changes
-    return cleanup;
-  }, [userGeneralSetting?.theme, instanceStore.state.theme]);
+    return dispose;
+  }, [userGeneralSetting?.theme]);
 
   return <Outlet />;
 });

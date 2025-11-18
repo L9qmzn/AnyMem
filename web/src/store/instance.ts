@@ -5,7 +5,7 @@
  * This is a server state store that fetches instance profile and settings.
  */
 import { uniqBy } from "lodash-es";
-import { computed } from "mobx";
+import { action, computed, makeObservable } from "mobx";
 import { instanceServiceClient } from "@/grpcweb";
 import {
   InstanceProfile,
@@ -57,15 +57,28 @@ class InstanceState extends StandardState {
    */
   settings: InstanceSetting[] = [];
 
+  constructor() {
+    super();
+    // Important: makeObservable must be called to make properties observable
+    // This allows MobX to track changes to locale, theme, profile, and settings
+    makeObservable(this, {
+      locale: true,
+      theme: true,
+      profile: true,
+      settings: true,
+      generalSetting: computed,
+      memoRelatedSetting: computed,
+      setPartial: action,
+    });
+  }
+
   /**
    * Computed property for general settings
    * Memoized for performance
    */
   get generalSetting(): InstanceSetting_GeneralSetting {
-    return computed(() => {
-      const setting = this.settings.find((s) => s.name === `${instanceSettingNamePrefix}${InstanceSetting_Key.GENERAL}`);
-      return setting?.generalSetting || InstanceSetting_GeneralSetting.fromPartial({});
-    }).get();
+    const setting = this.settings.find((s) => s.name === `${instanceSettingNamePrefix}${InstanceSetting_Key.GENERAL}`);
+    return setting?.generalSetting || InstanceSetting_GeneralSetting.fromPartial({});
   }
 
   /**
@@ -73,10 +86,8 @@ class InstanceState extends StandardState {
    * Memoized for performance
    */
   get memoRelatedSetting(): InstanceSetting_MemoRelatedSetting {
-    return computed(() => {
-      const setting = this.settings.find((s) => s.name === `${instanceSettingNamePrefix}${InstanceSetting_Key.MEMO_RELATED}`);
-      return setting?.memoRelatedSetting || InstanceSetting_MemoRelatedSetting.fromPartial({});
-    }).get();
+    const setting = this.settings.find((s) => s.name === `${instanceSettingNamePrefix}${InstanceSetting_Key.MEMO_RELATED}`);
+    return setting?.memoRelatedSetting || InstanceSetting_MemoRelatedSetting.fromPartial({});
   }
 
   /**
@@ -252,9 +263,11 @@ export const initialInstanceStore = async (): Promise<void> => {
 
     // Apply settings to state
     const instanceGeneralSetting = instanceStore.state.generalSetting;
+    const instanceLocale = instanceGeneralSetting.customProfile?.locale || "en";
+    const instanceTheme = instanceGeneralSetting.theme || "system";
     instanceStore.state.setPartial({
-      locale: instanceGeneralSetting.customProfile?.locale || "en",
-      theme: instanceGeneralSetting.theme || "system",
+      locale: instanceLocale,
+      theme: instanceTheme,
       profile: instanceProfile,
     });
   } catch (error) {
