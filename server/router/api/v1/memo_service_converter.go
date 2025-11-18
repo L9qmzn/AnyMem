@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/usememos/memos/internal/util"
 	v1pb "github.com/usememos/memos/proto/gen/api/v1"
 	storepb "github.com/usememos/memos/proto/gen/store"
 	"github.com/usememos/memos/store"
@@ -24,6 +25,9 @@ func (s *APIV1Service) convertMemoFromStore(ctx context.Context, memo *store.Mem
 	}
 
 	name := fmt.Sprintf("%s%s", MemoNamePrefix, memo.UID)
+	// Ensure content is valid UTF-8 for gRPC marshaling
+	sanitizedContent := util.SanitizeUTF8(memo.Content)
+
 	memoMessage := &v1pb.Memo{
 		Name:        name,
 		State:       convertStateFromStore(memo.RowStatus),
@@ -31,12 +35,17 @@ func (s *APIV1Service) convertMemoFromStore(ctx context.Context, memo *store.Mem
 		CreateTime:  timestamppb.New(time.Unix(memo.CreatedTs, 0)),
 		UpdateTime:  timestamppb.New(time.Unix(memo.UpdatedTs, 0)),
 		DisplayTime: timestamppb.New(time.Unix(displayTs, 0)),
-		Content:     memo.Content,
+		Content:     sanitizedContent,
 		Visibility:  convertVisibilityFromStore(memo.Visibility),
 		Pinned:      memo.Pinned,
 	}
 	if memo.Payload != nil {
-		memoMessage.Tags = memo.Payload.Tags
+		// Sanitize tags to ensure valid UTF-8
+		sanitizedTags := make([]string, len(memo.Payload.Tags))
+		for i, tag := range memo.Payload.Tags {
+			sanitizedTags[i] = util.SanitizeUTF8(tag)
+		}
+		memoMessage.Tags = sanitizedTags
 		memoMessage.Property = convertMemoPropertyFromStore(memo.Payload.Property)
 		memoMessage.Location = convertLocationFromStore(memo.Payload.Location)
 	}

@@ -6,6 +6,7 @@ import (
 	"net/mail"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 )
@@ -70,4 +71,35 @@ func ReplaceString(slice []string, old, new string) []string {
 		}
 	}
 	return slice
+}
+
+// SanitizeUTF8 removes invalid UTF-8 sequences from a string.
+// This is critical for gRPC which requires valid UTF-8 in all string fields.
+// Invalid sequences are replaced with the Unicode replacement character (�).
+func SanitizeUTF8(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+
+	// String contains invalid UTF-8, need to clean it
+	var sb strings.Builder
+	sb.Grow(len(s))
+
+	for len(s) > 0 {
+		r, size := utf8.DecodeRuneInString(s)
+		if r == utf8.RuneError && size == 1 {
+			// Invalid UTF-8 sequence, replace with replacement character
+			sb.WriteRune(utf8.RuneError)
+		} else {
+			sb.WriteRune(r)
+		}
+		s = s[size:]
+	}
+
+	return sb.String()
+}
+
+// IsValidUTF8 checks if a string contains only valid UTF-8.
+func IsValidUTF8(s string) bool {
+	return utf8.ValidString(s)
 }

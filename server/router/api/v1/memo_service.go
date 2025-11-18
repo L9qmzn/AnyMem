@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/usememos/memos/internal/base"
+	"github.com/usememos/memos/internal/util"
 	"github.com/usememos/memos/plugin/webhook"
 	v1pb "github.com/usememos/memos/proto/gen/api/v1"
 	storepb "github.com/usememos/memos/proto/gen/store"
@@ -39,10 +40,13 @@ func (s *APIV1Service) CreateMemo(ctx context.Context, request *v1pb.CreateMemoR
 		return nil, status.Errorf(codes.InvalidArgument, "invalid memo_id format: must be 1-32 characters, alphanumeric and hyphens only, cannot start or end with hyphen")
 	}
 
+	// Sanitize content to ensure valid UTF-8 (required for gRPC)
+	sanitizedContent := util.SanitizeUTF8(request.Memo.Content)
+
 	create := &store.Memo{
 		UID:        memoUID,
 		CreatorID:  user.ID,
-		Content:    request.Memo.Content,
+		Content:    sanitizedContent,
 		Visibility: convertVisibilityToStore(request.Memo.Visibility),
 	}
 	instanceMemoRelatedSetting, err := s.Store.GetInstanceMemoRelatedSetting(ctx)
@@ -350,7 +354,8 @@ func (s *APIV1Service) UpdateMemo(ctx context.Context, request *v1pb.UpdateMemoR
 			if len(request.Memo.Content) > contentLengthLimit {
 				return nil, status.Errorf(codes.InvalidArgument, "content too long (max %d characters)", contentLengthLimit)
 			}
-			memo.Content = request.Memo.Content
+			// Sanitize content to ensure valid UTF-8 (required for gRPC)
+			memo.Content = util.SanitizeUTF8(request.Memo.Content)
 			if err := memopayload.RebuildMemoPayload(memo, s.MarkdownService); err != nil {
 				return nil, status.Errorf(codes.Internal, "failed to rebuild memo payload: %v", err)
 			}
@@ -762,6 +767,8 @@ func (s *APIV1Service) getMemoContentSnippet(content string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to generate snippet")
 	}
+	// Ensure snippet is valid UTF-8 (important for gRPC marshaling)
+	snippet = util.SanitizeUTF8(snippet)
 	return snippet, nil
 }
 
