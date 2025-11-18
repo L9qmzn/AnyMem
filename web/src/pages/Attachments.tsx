@@ -1,18 +1,20 @@
 import dayjs from "dayjs";
 import { includes } from "lodash-es";
-import { PaperclipIcon, SearchIcon } from "lucide-react";
+import { PaperclipIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import AttachmentIcon from "@/components/AttachmentIcon";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import Empty from "@/components/Empty";
 import MobileHeader from "@/components/MobileHeader";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { attachmentServiceClient } from "@/grpcweb";
 import useLoading from "@/hooks/useLoading";
 import useResponsiveWidth from "@/hooks/useResponsiveWidth";
 import i18n from "@/i18n";
-import { memoStore } from "@/store";
+import { attachmentStore, memoStore } from "@/store";
 import { Attachment } from "@/types/proto/api/v1/attachment_service";
 import { useTranslate } from "@/utils/i18n";
 
@@ -34,6 +36,12 @@ interface State {
   searchQuery: string;
 }
 
+interface DeleteConfirmState {
+  open: boolean;
+  type: "single" | "batch";
+  attachment?: Attachment;
+}
+
 const Attachments = observer(() => {
   const t = useTranslate();
   const { md } = useResponsiveWidth();
@@ -42,6 +50,10 @@ const Attachments = observer(() => {
     searchQuery: "",
   });
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmState>({
+    open: false,
+    type: "single",
+  });
   const filteredAttachments = attachments.filter((attachment) => includes(attachment.filename, state.searchQuery));
   const groupedAttachments = groupAttachmentsByDate(filteredAttachments.filter((attachment) => attachment.memo));
   const unusedAttachments = filteredAttachments.filter((attachment) => !attachment.memo);
@@ -53,6 +65,31 @@ const Attachments = observer(() => {
       Promise.all(attachments.map((attachment) => (attachment.memo ? memoStore.getOrFetchMemoByName(attachment.memo) : null)));
     });
   }, []);
+
+  const handleDeleteSingleAttachment = async (attachment: Attachment) => {
+    setDeleteConfirm({
+      open: true,
+      type: "single",
+      attachment,
+    });
+  };
+
+  const handleDeleteAllUnused = () => {
+    setDeleteConfirm({
+      open: true,
+      type: "batch",
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirm.type === "single" && deleteConfirm.attachment) {
+      await attachmentStore.deleteAttachment(deleteConfirm.attachment.name);
+      setAttachments(attachments.filter((a) => a.name !== deleteConfirm.attachment?.name));
+    } else if (deleteConfirm.type === "batch") {
+      await Promise.all(unusedAttachments.map((attachment) => attachmentStore.deleteAttachment(attachment.name)));
+      setAttachments(attachments.filter((a) => a.memo));
+    }
+  };
 
   return (
     <section className="@container w-full max-w-5xl min-h-full flex flex-col justify-start items-center sm:pt-3 md:pt-6 pb-8">
@@ -123,15 +160,28 @@ const Attachments = observer(() => {
                         <div className="w-full flex flex-row justify-start items-start">
                           <div className="w-16 sm:w-24 sm:pl-4 flex flex-col justify-start items-start"></div>
                           <div className="w-full max-w-[calc(100%-4rem)] sm:max-w-[calc(100%-6rem)] flex flex-row justify-start items-start gap-4 flex-wrap">
-                            <div className="w-full flex flex-row justify-start items-center gap-2">
-                              <span className="text-muted-foreground">{t("resource.unused-resources")}</span>
-                              <span className="text-muted-foreground opacity-80">({unusedAttachments.length})</span>
+                            <div className="w-full flex flex-row justify-between items-center gap-2">
+                              <div className="flex flex-row justify-start items-center gap-2">
+                                <span className="text-muted-foreground">{t("resource.unused-resources")}</span>
+                                <span className="text-muted-foreground opacity-80">({unusedAttachments.length})</span>
+                              </div>
+                              <Button variant="destructive" size="sm" onClick={handleDeleteAllUnused}>
+                                <Trash2Icon className="w-4 h-4 mr-1" />
+                                {t("resource.delete-all-unused")}
+                              </Button>
                             </div>
                             {unusedAttachments.map((attachment) => {
                               return (
-                                <div key={attachment.name} className="w-24 sm:w-32 h-auto flex flex-col justify-start items-start">
-                                  <div className="w-24 h-24 flex justify-center items-center sm:w-32 sm:h-32 border border-border overflow-clip rounded-xl cursor-pointer hover:shadow hover:opacity-80">
+                                <div key={attachment.name} className="w-24 sm:w-32 h-auto flex flex-col justify-start items-start group">
+                                  <div className="w-24 h-24 flex justify-center items-center sm:w-32 sm:h-32 border border-border overflow-clip rounded-xl relative">
                                     <AttachmentIcon attachment={attachment} strokeWidth={0.5} />
+                                    <button
+                                      className="absolute top-1 right-1 p-1 bg-destructive/90 hover:bg-destructive text-destructive-foreground rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onClick={() => handleDeleteSingleAttachment(attachment)}
+                                      title={t("resource.delete-resource")}
+                                    >
+                                      <Trash2Icon className="w-3 h-3" />
+                                    </button>
                                   </div>
                                   <div className="w-full max-w-full flex flex-row justify-between items-center mt-1 px-1">
                                     <p className="text-xs shrink text-muted-foreground truncate">{attachment.filename}</p>
@@ -150,6 +200,24 @@ const Attachments = observer(() => {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ ...deleteConfirm, open })}
+        title={
+          deleteConfirm.type === "single"
+            ? t("resource.delete-resource")
+            : `${t("resource.delete-all-unused")} (${unusedAttachments.length})`
+        }
+        description={
+          deleteConfirm.type === "single"
+            ? deleteConfirm.attachment?.filename
+            : t("resource.delete-all-unused-confirm")
+        }
+        confirmLabel={t("common.delete")}
+        cancelLabel={t("common.cancel")}
+        onConfirm={handleConfirmDelete}
+        confirmVariant="destructive"
+      />
     </section>
   );
 });
