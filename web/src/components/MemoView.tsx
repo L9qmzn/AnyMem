@@ -1,4 +1,4 @@
-import { BookmarkIcon, EyeOffIcon, MessageCircleMoreIcon } from "lucide-react";
+import { BookmarkIcon, EyeOffIcon, HashIcon, MessageCircleMoreIcon, SparklesIcon } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -8,12 +8,14 @@ import useAsyncEffect from "@/hooks/useAsyncEffect";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useNavigateTo from "@/hooks/useNavigateTo";
 import { cn } from "@/lib/utils";
-import { instanceStore, memoStore, userStore } from "@/store";
+import { instanceStore, memoFilterStore, memoStore, userStore, viewStore } from "@/store";
 import { State } from "@/types/proto/api/v1/common";
 import { Memo, MemoRelation_Type, Visibility } from "@/types/proto/api/v1/memo_service";
 import { useTranslate } from "@/utils/i18n";
 import { convertVisibilityToString } from "@/utils/memo";
 import { isSuperUser } from "@/utils/user";
+import { Routes } from "@/router";
+import { stringifyFilters } from "@/store/memoFilter";
 import MemoActionMenu from "./MemoActionMenu";
 import MemoContent from "./MemoContent";
 import MemoEditor from "./MemoEditor";
@@ -23,6 +25,43 @@ import PreviewImageDialog from "./PreviewImageDialog";
 import ReactionSelector from "./ReactionSelector";
 import UserAvatar from "./UserAvatar";
 import VisibilityIcon from "./VisibilityIcon";
+
+const TAG_CHAR_REGEX = /[\p{L}\p{N}_\-/]/u;
+
+const isTagChar = (char: string): boolean => TAG_CHAR_REGEX.test(char);
+
+/**
+ * Strip inline #tags from memo content while keeping the rest of the text intact.
+ * Mirrors the rules from remark-tag so display matches editor rendering.
+ */
+const removeInlineTags = (content: string): string => {
+  let result = "";
+  let i = 0;
+  while (i < content.length) {
+    const char = content[i];
+    if (char === "#" && i + 1 < content.length && isTagChar(content[i + 1])) {
+      const prevChar = i > 0 ? content[i - 1] : "";
+      const nextChar = content[i + 1];
+      if (prevChar === "#" || nextChar === "#" || nextChar === " ") {
+        result += char;
+        i++;
+        continue;
+      }
+      let j = i + 1;
+      while (j < content.length && isTagChar(content[j])) {
+        j++;
+      }
+      const tagLength = j - (i + 1);
+      if (tagLength > 0 && tagLength <= 100) {
+        i = j;
+        continue;
+      }
+    }
+    result += char;
+    i++;
+  }
+  return result;
+};
 
 interface Props {
   memo: Memo;
@@ -63,6 +102,13 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
   const readonly = memo.creator !== user?.name && !isSuperUser(user);
   const isInMemoDetailPage = location.pathname.startsWith(`/${memo.name}`);
   const parentPage = props.parentPage || location.pathname;
+  const preserveInlineTags = viewStore.state.preserveInlineTags;
+  const showAiTags = viewStore.state.showAiTags;
+  const displayContent = preserveInlineTags ? memo.content : removeInlineTags(memo.content);
+  const tags = memo.tags || [];
+  const aiTags = memo.aiTags || [];
+  const activeTagFilters = memoFilterStore.getFiltersByFactor("tagSearch");
+  const activeTagSet = new Set(activeTagFilters.map((filter) => filter.value));
   const nsfw =
     instanceMemoRelatedSetting.enableBlurNsfwContent &&
     memo.tags?.some((tag) => instanceMemoRelatedSetting.nsfwTags.some((nsfwTag) => tag === nsfwTag || tag.startsWith(`${nsfwTag}/`)));
@@ -216,6 +262,26 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
     <relative-time datetime={memo.displayTime?.toISOString()} format={relativeTimeFormat}></relative-time>
   );
 
+  const handleTagChipClick = (tag: string) => {
+    if (location.pathname.startsWith("/m")) {
+      const pathname = parentPage || Routes.ROOT;
+      const searchParams = new URLSearchParams();
+      searchParams.set("filter", stringifyFilters([{ factor: "tagSearch", value: tag }]));
+      navigateTo(`${pathname}?${searchParams.toString()}`);
+      return;
+    }
+
+    const isActive = memoFilterStore.getFiltersByFactor("tagSearch").some((filter) => filter.value === tag);
+    if (isActive) {
+      memoFilterStore.removeFilter((f) => f.factor === "tagSearch" && f.value === tag);
+    } else {
+      memoFilterStore.addFilter({
+        factor: "tagSearch",
+        value: tag,
+      });
+    }
+  };
+
   return showEditor ? (
     <MemoEditor
       autoFocus
@@ -338,7 +404,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
         <MemoContent
           key={`${memo.name}-${memo.updateTime}`}
           memoName={memo.name}
-          content={memo.content}
+          content={displayContent}
           readonly={readonly}
           onClick={handleMemoContentClick}
           onDoubleClick={handleMemoContentDoubleClick}
@@ -349,6 +415,64 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
         <AttachmentList mode="view" attachments={memo.attachments} />
         <RelationList mode="view" relations={referencedMemos} currentMemoName={memo.name} parentPage={parentPage} />
         <MemoReactionistView memo={memo} reactions={memo.reactions} />
+        {tags.length > 0 && (
+          <div className="w-full flex flex-col gap-1">
+            <div className="flex flex-row items-center gap-1 text-xs text-muted-foreground select-none leading-tight">
+              <HashIcon className="w-3.5 h-auto opacity-70" />
+              <span>{t("common.tags")}</span>
+              <span className="opacity-70">({tags.length})</span>
+            </div>
+            <div className="w-full flex flex-row flex-wrap gap-2">
+              {tags.map((tag) => {
+                const isActive = activeTagSet.has(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors",
+                      isActive && "border-primary text-primary bg-primary/10",
+                    )}
+                    aria-pressed={isActive}
+                    onClick={() => handleTagChipClick(tag)}
+                  >
+                    <HashIcon className="w-3 h-auto opacity-70" />
+                    <span className="truncate">{tag}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {showAiTags && aiTags.length > 0 && (
+          <div className="w-full flex flex-col gap-1">
+            <div className="flex flex-row items-center gap-1 text-xs text-muted-foreground select-none leading-tight">
+              <SparklesIcon className="w-3.5 h-auto opacity-70" />
+              <span>{t("memo.ai-tags")}</span>
+              <span className="opacity-70">({aiTags.length})</span>
+            </div>
+            <div className="w-full flex flex-row flex-wrap gap-2">
+              {aiTags.map((tag) => {
+                const isActive = activeTagSet.has(tag);
+                return (
+                  <button
+                    key={`ai-${tag}`}
+                    type="button"
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full border border-dashed text-muted-foreground hover:text-foreground hover:border-foreground transition-colors",
+                      isActive && "border-primary text-primary bg-primary/10",
+                    )}
+                    aria-pressed={isActive}
+                    onClick={() => handleTagChipClick(tag)}
+                  >
+                    <SparklesIcon className="w-3 h-auto opacity-70" />
+                    <span className="truncate">{tag}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
       {nsfw && !showNSFWContent && (
         <>

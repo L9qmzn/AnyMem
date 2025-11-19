@@ -1,9 +1,11 @@
+import { observer } from "mobx-react-lite";
 import { isEqual } from "lodash-es";
-import { CheckCircleIcon, Code2Icon, HashIcon, LinkIcon } from "lucide-react";
+import { CheckCircleIcon, Code2Icon, HashIcon, LinkIcon, SparklesIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Memo, Memo_Property, MemoRelation_Type } from "@/types/proto/api/v1/memo_service";
 import { useTranslate } from "@/utils/i18n";
 import MemoRelationForceGraph from "../MemoRelationForceGraph";
+import { viewStore } from "@/store";
 
 interface Props {
   memo: Memo;
@@ -11,8 +13,9 @@ interface Props {
   parentPage?: string;
 }
 
-const MemoDetailSidebar = ({ memo, className, parentPage }: Props) => {
+const MemoDetailSidebar = observer(({ memo, className, parentPage }: Props) => {
   const t = useTranslate();
+  const showAiTags = viewStore.state.showAiTags;
   const property = Memo_Property.fromPartial(memo.property || {});
   const hasSpecialProperty = property.hasLink || property.hasTaskList || property.hasCode || property.hasIncompleteTasks;
   const shouldShowRelationGraph = memo.relations.filter((r) => r.type === MemoRelation_Type.REFERENCE).length > 0;
@@ -99,9 +102,30 @@ const MemoDetailSidebar = ({ memo, className, parentPage }: Props) => {
             </div>
           </div>
         )}
+        {showAiTags && memo.aiTags?.length > 0 && (
+          <div className="w-full">
+            <div className="flex flex-row justify-start items-center w-full gap-1 mb-1 text-sm leading-6 text-muted-foreground select-none">
+              <span>{t("memo.ai-tags")}</span>
+              <span className="shrink-0">({memo.aiTags.length})</span>
+            </div>
+            <div className="w-full flex flex-row justify-start items-center relative flex-wrap gap-x-2 gap-y-1">
+              {memo.aiTags.map((tag) => (
+                <div
+                  key={tag}
+                  className="shrink-0 w-auto max-w-full text-sm rounded-md leading-6 flex flex-row justify-start items-center select-none hover:opacity-80 text-muted-foreground"
+                >
+                  <SparklesIcon className="w-4 h-auto shrink-0 opacity-40" />
+                  <div className={cn("inline-flex flex-nowrap ml-0.5 gap-0.5 cursor-pointer max-w-[calc(100%-16px)]")}>
+                    <span className="truncate opacity-80">{tag}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </aside>
   );
-};
+});
 
 export default MemoDetailSidebar;

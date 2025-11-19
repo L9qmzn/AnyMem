@@ -11,6 +11,9 @@ message MemoPayload {
 
   repeated string tags = 3;
 
+  // The AI generated tags extracted from memo content.
+  repeated string ai_tags = 4;
+
   // The calculated properties from the memo content.
   message Property {
     bool has_link = 1;

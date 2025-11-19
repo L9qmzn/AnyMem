@@ -1,6 +1,7 @@
 import { Settings2Icon } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { viewStore } from "@/store";
 import { useTranslate } from "@/utils/i18n";
@@ -12,7 +13,11 @@ interface Props {
 
 const MemoDisplaySettingMenu = observer(({ className }: Props) => {
   const t = useTranslate();
-  const isApplying = viewStore.state.orderByTimeAsc !== false || viewStore.state.layout !== "LIST";
+  const isApplying =
+    viewStore.state.orderByTimeAsc !== false ||
+    viewStore.state.layout !== "LIST" ||
+    viewStore.state.preserveInlineTags !== true ||
+    viewStore.state.showAiTags !== true;
 
   return (
     <Popover>
@@ -58,6 +63,28 @@ const MemoDisplaySettingMenu = observer(({ className }: Props) => {
                 <SelectItem value="MASONRY">{t("memo.masonry")}</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="w-full flex flex-row justify-between items-center">
+            <span className="text-sm shrink-0 mr-3 text-foreground">{t("memo.preserve-inline-tags")}</span>
+            <Switch
+              checked={viewStore.state.preserveInlineTags}
+              onCheckedChange={(checked) =>
+                viewStore.state.setPartial({
+                  preserveInlineTags: checked,
+                })
+              }
+            />
+          </div>
+          <div className="w-full flex flex-row justify-between items-center">
+            <span className="text-sm shrink-0 mr-3 text-foreground">{t("memo.show-ai-tags")}</span>
+            <Switch
+              checked={viewStore.state.showAiTags}
+              onCheckedChange={(checked) =>
+                viewStore.state.setPartial({
+                  showAiTags: checked,
+                })
+              }
+            />
           </div>
         </div>
       </PopoverContent>

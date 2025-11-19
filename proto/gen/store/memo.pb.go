@@ -22,10 +22,12 @@ const (
 )
 
 type MemoPayload struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Property      *MemoPayload_Property  `protobuf:"bytes,1,opt,name=property,proto3" json:"property,omitempty"`
-	Location      *MemoPayload_Location  `protobuf:"bytes,2,opt,name=location,proto3" json:"location,omitempty"`
-	Tags          []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Property *MemoPayload_Property  `protobuf:"bytes,1,opt,name=property,proto3" json:"property,omitempty"`
+	Location *MemoPayload_Location  `protobuf:"bytes,2,opt,name=location,proto3" json:"location,omitempty"`
+	Tags     []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`
+	// The AI generated tags extracted from memo content.
+	AiTags        []string `protobuf:"bytes,4,rep,name=ai_tags,json=aiTags,proto3" json:"ai_tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -77,6 +79,13 @@ func (x *MemoPayload) GetLocation() *MemoPayload_Location {
 func (x *MemoPayload) GetTags() []string {
 	if x != nil {
 		return x.Tags
+	}
+	return nil
+}
+
+func (x *MemoPayload) GetAiTags() []string {
+	if x != nil {
+		return x.AiTags
 	}
 	return nil
 }
@@ -214,11 +223,12 @@ var File_store_memo_proto protoreflect.FileDescriptor
 
 const file_store_memo_proto_rawDesc = "" +
 	"\n" +
-	"\x10store/memo.proto\x12\vmemos.store\"\xa0\x03\n" +
+	"\x10store/memo.proto\x12\vmemos.store\"\xb9\x03\n" +
 	"\vMemoPayload\x12=\n" +
 	"\bproperty\x18\x01 \x01(\v2!.memos.store.MemoPayload.PropertyR\bproperty\x12=\n" +
 	"\blocation\x18\x02 \x01(\v2!.memos.store.MemoPayload.LocationR\blocation\x12\x12\n" +
-	"\x04tags\x18\x03 \x03(\tR\x04tags\x1a\x96\x01\n" +
+	"\x04tags\x18\x03 \x03(\tR\x04tags\x12\x17\n" +
+	"\aai_tags\x18\x04 \x03(\tR\x06aiTags\x1a\x96\x01\n" +
 	"\bProperty\x12\x19\n" +
 	"\bhas_link\x18\x01 \x01(\bR\ahasLink\x12\"\n" +
 	"\rhas_task_list\x18\x02 \x01(\bR\vhasTaskList\x12\x19\n" +

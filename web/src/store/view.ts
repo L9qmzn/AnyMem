@@ -31,11 +31,24 @@ class ViewState extends StandardState {
    */
   layout: LayoutMode = "LIST";
 
+  /**
+   * Whether to keep inline #tags inside memo content
+   * When disabled, memo snippets (without tags) are shown instead
+   */
+  preserveInlineTags: boolean = true;
+
+  /**
+   * Whether to show AI-generated tags beneath the manual tags.
+   */
+  showAiTags: boolean = true;
+
   constructor() {
     super();
     makeObservable(this, {
       orderByTimeAsc: observable,
       layout: observable,
+      preserveInlineTags: observable,
+      showAiTags: observable,
     });
   }
 
@@ -48,6 +61,14 @@ class ViewState extends StandardState {
       console.warn(`Invalid layout "${partial.layout}", ignoring`);
       return;
     }
+    if (partial.preserveInlineTags !== undefined && typeof partial.preserveInlineTags !== "boolean") {
+      console.warn(`Invalid preserveInlineTags value "${partial.preserveInlineTags}", ignoring`);
+      return;
+    }
+    if (partial.showAiTags !== undefined && typeof partial.showAiTags !== "boolean") {
+      console.warn(`Invalid showAiTags value "${partial.showAiTags}", ignoring`);
+      return;
+    }
 
     Object.assign(this, partial);
 
@@ -58,6 +79,8 @@ class ViewState extends StandardState {
         JSON.stringify({
           orderByTimeAsc: this.orderByTimeAsc,
           layout: this.layout,
+          preserveInlineTags: this.preserveInlineTags,
+          showAiTags: this.showAiTags,
         }),
       );
     } catch (error) {
@@ -87,6 +110,14 @@ const viewStore = (() => {
       if (Object.hasOwn(data, "layout") && ["LIST", "MASONRY"].includes(data.layout)) {
         state.layout = data.layout as LayoutMode;
       }
+
+      if (Object.hasOwn(data, "preserveInlineTags")) {
+        state.preserveInlineTags = Boolean(data.preserveInlineTags);
+      }
+
+      if (Object.hasOwn(data, "showAiTags")) {
+        state.showAiTags = Boolean(data.showAiTags);
+      }
     }
   } catch (error) {
     console.warn("Failed to load view settings from localStorage:", error);
@@ -115,6 +146,8 @@ const viewStore = (() => {
     state.setPartial({
       orderByTimeAsc: false,
       layout: "LIST",
+      preserveInlineTags: true,
+      showAiTags: true,
     });
   };
 

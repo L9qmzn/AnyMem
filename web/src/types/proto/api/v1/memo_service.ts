@@ -113,6 +113,8 @@ export interface Memo {
   visibility: Visibility;
   /** Output only. The tags extracted from the content. */
   tags: string[];
+  /** Output only. AI-generated tags derived from the content. */
+  aiTags: string[];
   /** Whether the memo is pinned. */
   pinned: boolean;
   /** Optional. The attachments of the memo. */
@@ -543,6 +545,7 @@ function createBaseMemo(): Memo {
     content: "",
     visibility: Visibility.VISIBILITY_UNSPECIFIED,
     tags: [],
+    aiTags: [],
     pinned: false,
     attachments: [],
     relations: [],
@@ -582,6 +585,9 @@ export const Memo: MessageFns<Memo> = {
     }
     for (const v of message.tags) {
       writer.uint32(82).string(v!);
+    }
+    for (const v of message.aiTags) {
+      writer.uint32(154).string(v!);
     }
     if (message.pinned !== false) {
       writer.uint32(88).bool(message.pinned);
@@ -689,6 +695,14 @@ export const Memo: MessageFns<Memo> = {
           message.tags.push(reader.string());
           continue;
         }
+        case 19: {
+          if (tag !== 154) {
+            break;
+          }
+
+          message.aiTags.push(reader.string());
+          continue;
+        }
         case 11: {
           if (tag !== 88) {
             break;
@@ -776,6 +790,7 @@ export const Memo: MessageFns<Memo> = {
     message.content = object.content ?? "";
     message.visibility = object.visibility ?? Visibility.VISIBILITY_UNSPECIFIED;
     message.tags = object.tags?.map((e) => e) || [];
+    message.aiTags = object.aiTags?.map((e) => e) || [];
     message.pinned = object.pinned ?? false;
     message.attachments = object.attachments?.map((e) => Attachment.fromPartial(e)) || [];
     message.relations = object.relations?.map((e) => MemoRelation.fromPartial(e)) || [];

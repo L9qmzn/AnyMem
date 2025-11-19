@@ -234,6 +234,8 @@ type Memo struct {
 	Visibility Visibility `protobuf:"varint,9,opt,name=visibility,proto3,enum=memos.api.v1.Visibility" json:"visibility,omitempty"`
 	// Output only. The tags extracted from the content.
 	Tags []string `protobuf:"bytes,10,rep,name=tags,proto3" json:"tags,omitempty"`
+	// Output only. AI-generated tags derived from the content.
+	AiTags []string `protobuf:"bytes,19,rep,name=ai_tags,json=aiTags,proto3" json:"ai_tags,omitempty"`
 	// Whether the memo is pinned.
 	Pinned bool `protobuf:"varint,11,opt,name=pinned,proto3" json:"pinned,omitempty"`
 	// Optional. The attachments of the memo.
@@ -344,6 +346,13 @@ func (x *Memo) GetVisibility() Visibility {
 func (x *Memo) GetTags() []string {
 	if x != nil {
 		return x.Tags
+	}
+	return nil
+}
+
+func (x *Memo) GetAiTags() []string {
+	if x != nil {
+		return x.AiTags
 	}
 	return nil
 }
@@ -1810,7 +1819,7 @@ const file_api_v1_memo_service_proto_rawDesc = "" +
 	"\rreaction_type\x18\x04 \x01(\tB\x03\xe0A\x02R\freactionType\x12@\n" +
 	"\vcreate_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"createTime:K\xeaAH\n" +
-	"\x15memos.api.v1/Reaction\x12\x14reactions/{reaction}\x1a\x04name*\treactions2\breaction\"\xd8\b\n" +
+	"\x15memos.api.v1/Reaction\x12\x14reactions/{reaction}\x1a\x04name*\treactions2\breaction\"\xf6\b\n" +
 	"\x04Memo\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12.\n" +
 	"\x05state\x18\x02 \x01(\x0e2\x13.memos.api.v1.StateB\x03\xe0A\x02R\x05state\x123\n" +
@@ -1826,7 +1835,8 @@ const file_api_v1_memo_service_proto_rawDesc = "" +
 	"visibility\x18\t \x01(\x0e2\x18.memos.api.v1.VisibilityB\x03\xe0A\x02R\n" +
 	"visibility\x12\x17\n" +
 	"\x04tags\x18\n" +
-	" \x03(\tB\x03\xe0A\x03R\x04tags\x12\x1b\n" +
+	" \x03(\tB\x03\xe0A\x03R\x04tags\x12\x1c\n" +
+	"\aai_tags\x18\x13 \x03(\tB\x03\xe0A\x03R\x06aiTags\x12\x1b\n" +
 	"\x06pinned\x18\v \x01(\bB\x03\xe0A\x01R\x06pinned\x12?\n" +
 	"\vattachments\x18\f \x03(\v2\x18.memos.api.v1.AttachmentB\x03\xe0A\x01R\vattachments\x12=\n" +
 	"\trelations\x18\r \x03(\v2\x1a.memos.api.v1.MemoRelationB\x03\xe0A\x01R\trelations\x129\n" +

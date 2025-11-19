@@ -191,6 +191,9 @@ message Memo {
   // Output only. The tags extracted from the content.
   repeated string tags = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // Output only. AI-generated tags derived from the content.
+  repeated string ai_tags = 19 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // Whether the memo is pinned.
   bool pinned = 11 [(google.api.field_behavior) = OPTIONAL];
 
