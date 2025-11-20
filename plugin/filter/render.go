@@ -307,6 +307,10 @@ func (r *renderer) renderInCondition(cond *InCondition) (renderResult, error) {
 		return r.renderTagInList(cond.Values)
 	}
 
+	if fieldRef.Name == "ai_tag" {
+		return r.renderAiTagInList(cond.Values)
+	}
+
 	field, ok := r.schema.Field(fieldRef.Name)
 	if !ok {
 		return renderResult{}, errors.Errorf("unknown field %q", fieldRef.Name)
@@ -334,6 +338,55 @@ func (r *renderer) renderTagInList(values []ValueExpr) (renderResult, error) {
 		str, ok := lit.(string)
 		if !ok {
 			return renderResult{}, errors.New("tags must be compared with string literals")
+		}
+
+		switch r.dialect {
+		case DialectSQLite:
+			// Support hierarchical tags: match exact tag OR tags with this prefix (e.g., "book" matches "book" and "book/something")
+			exactMatch := fmt.Sprintf("%s LIKE %s", jsonArrayExpr(r.dialect, field), r.addArg(fmt.Sprintf(`%%"%s"%%`, str)))
+			prefixMatch := fmt.Sprintf("%s LIKE %s", jsonArrayExpr(r.dialect, field), r.addArg(fmt.Sprintf(`%%"%s/%%`, str)))
+			expr := fmt.Sprintf("(%s OR %s)", exactMatch, prefixMatch)
+			conditions = append(conditions, expr)
+		case DialectMySQL:
+			// Support hierarchical tags: match exact tag OR tags with this prefix
+			exactMatch := fmt.Sprintf("JSON_CONTAINS(%s, %s)", jsonArrayExpr(r.dialect, field), r.addArg(fmt.Sprintf(`"%s"`, str)))
+			prefixMatch := fmt.Sprintf("%s LIKE %s", jsonArrayExpr(r.dialect, field), r.addArg(fmt.Sprintf(`%%"%s/%%`, str)))
+			expr := fmt.Sprintf("(%s OR %s)", exactMatch, prefixMatch)
+			conditions = append(conditions, expr)
+		case DialectPostgres:
+			// Support hierarchical tags: match exact tag OR tags with this prefix
+			exactMatch := fmt.Sprintf("%s @> jsonb_build_array(%s::json)", jsonArrayExpr(r.dialect, field), r.addArg(fmt.Sprintf(`"%s"`, str)))
+			prefixMatch := fmt.Sprintf("%s::text LIKE %s", jsonArrayExpr(r.dialect, field), r.addArg(fmt.Sprintf(`%%"%s/%%`, str)))
+			expr := fmt.Sprintf("(%s OR %s)", exactMatch, prefixMatch)
+			conditions = append(conditions, expr)
+		default:
+			return renderResult{}, errors.Errorf("unsupported dialect %s", r.dialect)
+		}
+	}
+
+	if len(conditions) == 1 {
+		return renderResult{sql: conditions[0]}, nil
+	}
+	return renderResult{
+		sql: fmt.Sprintf("(%s)", strings.Join(conditions, " OR ")),
+	}, nil
+}
+
+func (r *renderer) renderAiTagInList(values []ValueExpr) (renderResult, error) {
+	field, ok := r.schema.ResolveAlias("ai_tag")
+	if !ok {
+		return renderResult{}, errors.New("ai_tag attribute is not configured")
+	}
+
+	conditions := make([]string, 0, len(values))
+	for _, v := range values {
+		lit, err := expectLiteral(v)
+		if err != nil {
+			return renderResult{}, err
+		}
+		str, ok := lit.(string)
+		if !ok {
+			return renderResult{}, errors.New("ai_tags must be compared with string literals")
 		}
 
 		switch r.dialect {

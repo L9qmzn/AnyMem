@@ -108,7 +108,8 @@ export const useMemoFilters = (options: UseMemoFiltersOptions = {}): string | un
       if (filter.factor === "contentSearch") {
         conditions.push(`content.contains("${filter.value}")`);
       } else if (filter.factor === "tagSearch") {
-        conditions.push(`tag in ["${filter.value}"]`);
+        // Search in both regular tags and AI tags
+        conditions.push(`(tag in ["${filter.value}"] || ai_tag in ["${filter.value}"])`);
       } else if (filter.factor === "pinned") {
         if (includePinned) {
           conditions.push(`pinned`);

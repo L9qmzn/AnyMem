@@ -4,6 +4,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import type { StatisticsData } from "@/types/statistics";
 import StatisticsView from "../StatisticsView";
+import AiTagsSection from "./AiTagsSection";
 import ShortcutsSection from "./ShortcutsSection";
 import TagsSection from "./TagsSection";
 
@@ -65,6 +66,12 @@ interface Props {
    * Should be computed using useFilteredMemoStats with the same filter as the memo list
    */
   tagCount: Record<string, number>;
+
+  /**
+   * AI tag counts computed from filtered memos
+   * Should be computed using useFilteredMemoStats with the same filter as the memo list
+   */
+  aiTagCount: Record<string, number>;
 }
 
 /**
@@ -109,7 +116,7 @@ const getDefaultFeatures = (context: MemoExplorerContext): MemoExplorerFeatures 
 };
 
 const MemoExplorer = observer((props: Props) => {
-  const { className, context = "home", features: featureOverrides = {}, statisticsData, tagCount } = props;
+  const { className, context = "home", features: featureOverrides = {}, statisticsData, tagCount, aiTagCount } = props;
   const currentUser = useCurrentUser();
 
   // Merge default features with overrides
@@ -130,6 +137,7 @@ const MemoExplorer = observer((props: Props) => {
         {features.statistics && <StatisticsView context={features.statisticsContext} statisticsData={statisticsData} />}
         {features.shortcuts && currentUser && <ShortcutsSection />}
         {features.tags && <TagsSection readonly={context === "explore"} tagCount={tagCount} />}
+        {features.tags && <AiTagsSection readonly={context === "explore"} aiTagCount={aiTagCount} />}
       </div>
     </aside>
   );

@@ -26,10 +26,15 @@ interface Props {
    * Tag counts computed from filtered memos
    */
   tagCount: Record<string, number>;
+
+  /**
+   * AI tag counts computed from filtered memos
+   */
+  aiTagCount: Record<string, number>;
 }
 
 const MemoExplorerDrawer = (props: Props) => {
-  const { context, features, statisticsData, tagCount } = props;
+  const { context, features, statisticsData, tagCount, aiTagCount } = props;
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -48,7 +53,7 @@ const MemoExplorerDrawer = (props: Props) => {
         <SheetHeader>
           <SheetTitle />
         </SheetHeader>
-        <MemoExplorer className="px-4" context={context} features={features} statisticsData={statisticsData} tagCount={tagCount} />
+        <MemoExplorer className="px-4" context={context} features={features} statisticsData={statisticsData} tagCount={tagCount} aiTagCount={aiTagCount} />
       </SheetContent>
     </Sheet>
   );

@@ -8,6 +8,7 @@ import type { StatisticsData } from "@/types/statistics";
 export interface FilteredMemoStats {
   statistics: StatisticsData;
   tags: Record<string, number>;
+  aiTags: Record<string, number>;
   loading: boolean;
 }
 
@@ -49,6 +50,7 @@ export const useFilteredMemoStats = (filter?: string, state: State = State.NORMA
       activityStats: {},
     },
     tags: {},
+    aiTags: {},
     loading: true,
   });
 
@@ -69,6 +71,7 @@ export const useFilteredMemoStats = (filter?: string, state: State = State.NORMA
         // Compute statistics and tags from fetched memos
         const displayTimeList: Date[] = [];
         const tagCount: Record<string, number> = {};
+        const aiTagCount: Record<string, number> = {};
 
         if (response.memos) {
           for (const memo of response.memos) {
@@ -83,6 +86,13 @@ export const useFilteredMemoStats = (filter?: string, state: State = State.NORMA
                 tagCount[tag] = (tagCount[tag] || 0) + 1;
               }
             }
+
+            // Count AI tags
+            if (memo.aiTags && memo.aiTags.length > 0) {
+              for (const tag of memo.aiTags) {
+                aiTagCount[tag] = (aiTagCount[tag] || 0) + 1;
+              }
+            }
           }
         }
 
@@ -92,6 +102,7 @@ export const useFilteredMemoStats = (filter?: string, state: State = State.NORMA
         setData({
           statistics: { activityStats },
           tags: tagCount,
+          aiTags: aiTagCount,
           loading: false,
         });
       } catch (error) {
@@ -101,6 +112,7 @@ export const useFilteredMemoStats = (filter?: string, state: State = State.NORMA
             activityStats: {},
           },
           tags: {},
+          aiTags: {},
           loading: false,
         });
       }

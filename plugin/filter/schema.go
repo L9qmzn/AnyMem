@@ -174,6 +174,19 @@ func NewSchema() Schema {
 			Type:     FieldTypeString,
 			AliasFor: "tags",
 		},
+		"ai_tags": {
+			Name:     "ai_tags",
+			Kind:     FieldKindJSONList,
+			Type:     FieldTypeString,
+			Column:   Column{Table: "memo", Name: "payload"},
+			JSONPath: []string{"aiTags"},
+		},
+		"ai_tag": {
+			Name:     "ai_tag",
+			Kind:     FieldKindVirtualAlias,
+			Type:     FieldTypeString,
+			AliasFor: "ai_tags",
+		},
 		"has_task_list": {
 			Name:     "has_task_list",
 			Kind:     FieldKindJSONBool,
@@ -228,6 +241,8 @@ func NewSchema() Schema {
 		cel.Variable("pinned", cel.BoolType),
 		cel.Variable("tag", cel.StringType),
 		cel.Variable("tags", cel.ListType(cel.StringType)),
+		cel.Variable("ai_tag", cel.StringType),
+		cel.Variable("ai_tags", cel.ListType(cel.StringType)),
 		cel.Variable("visibility", cel.StringType),
 		cel.Variable("has_task_list", cel.BoolType),
 		cel.Variable("has_link", cel.BoolType),
