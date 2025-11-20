@@ -157,6 +157,7 @@
     "preserve-inline-tags": "保留正文内标签",
     "show-ai-tags": "显示 AI 标签",
     "ai-tags": "AI 标签",
+    "generate-ai-tags": "生成 AI 标签",
     "order-by": "排序",
     "remove-completed-task-list-items": "移除已办",
     "remove-completed-task-list-items-confirm": "您确定要移除所有完成的待办吗？（此操作不可逆）",
@@ -175,6 +176,8 @@
     "masonry": "瀑布流模式"
   },
   "message": {
+    "ai-tags-generated": "AI 标签生成成功",
+    "no-ai-tags-generated": "未生成新的 AI 标签",
     "archived-successfully": "归档成功",
     "change-memo-created-time": "更改备忘录创建时间",
     "copied": "已复制",

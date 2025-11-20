@@ -408,6 +408,13 @@ func (s *APIV1Service) UpdateMemo(ctx context.Context, request *v1pb.UpdateMemoR
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to set memo attachments")
 			}
+		} else if path == "ai_tags" {
+			payload := memo.Payload
+			if payload == nil {
+				payload = &storepb.MemoPayload{}
+			}
+			payload.AiTags = request.Memo.AiTags
+			update.Payload = payload
 		} else if path == "relations" {
 			_, err := s.SetMemoRelations(ctx, &v1pb.SetMemoRelationsRequest{
 				Name:      request.Memo.Name,

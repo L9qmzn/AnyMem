@@ -1,4 +1,4 @@
-import { BookmarkIcon, EyeOffIcon, HashIcon, MessageCircleMoreIcon, SparklesIcon } from "lucide-react";
+import { BookmarkIcon, EyeOffIcon, HashIcon, Loader2Icon, MessageCircleMoreIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -9,6 +9,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import useNavigateTo from "@/hooks/useNavigateTo";
 import { cn } from "@/lib/utils";
 import { instanceStore, memoFilterStore, memoStore, userStore, viewStore } from "@/store";
+import { memoServiceClient } from "@/grpcweb";
 import { State } from "@/types/proto/api/v1/common";
 import { Memo, MemoRelation_Type, Visibility } from "@/types/proto/api/v1/memo_service";
 import { useTranslate } from "@/utils/i18n";
@@ -91,6 +92,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
     index: 0,
   });
   const [shortcutActive, setShortcutActive] = useState(false);
+  const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const instanceMemoRelatedSetting = instanceStore.state.memoRelatedSetting;
   const referencedMemos = memo.relations.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
@@ -193,6 +195,39 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
       toast.error(error?.details);
     }
   }, [isArchived, memo.name, t, memoStore, userStore]);
+
+  const handleGenerateAiTags = useCallback(async () => {
+    if (isGeneratingTags || readonly) {
+      return;
+    }
+
+    setIsGeneratingTags(true);
+    try {
+      // Call backend to generate AI tags
+      const response = await memoServiceClient.generateAiTags({
+        name: memo.name,
+      });
+
+      if (response.tags && response.tags.length > 0) {
+        // Update memo with new AI tags
+        await memoStore.updateMemo(
+          {
+            name: memo.name,
+            aiTags: response.tags,
+          },
+          ["ai_tags"],
+        );
+        toast.success(t("message.ai-tags-generated"));
+      } else {
+        toast.success(t("message.no-ai-tags-generated"));
+      }
+    } catch (error: any) {
+      console.error("Failed to generate AI tags:", error);
+      toast.error(error?.message || "Failed to generate AI tags");
+    } finally {
+      setIsGeneratingTags(false);
+    }
+  }, [isGeneratingTags, readonly, memo.name, t]);
 
   useEffect(() => {
     if (!shortcutActive || readonly || showEditor || !cardRef.current) {
@@ -444,12 +479,27 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
             </div>
           </div>
         )}
-        {showAiTags && aiTags.length > 0 && (
+        {showAiTags && (
           <div className="w-full flex flex-col gap-1">
             <div className="flex flex-row items-center gap-1 text-xs text-muted-foreground select-none leading-tight">
               <SparklesIcon className="w-3.5 h-auto opacity-70" />
               <span>{t("memo.ai-tags")}</span>
-              <span className="opacity-70">({aiTags.length})</span>
+              {aiTags.length > 0 && <span className="opacity-70">({aiTags.length})</span>}
+              {!readonly && (
+                <button
+                  type="button"
+                  className="ml-1 p-0.5 rounded hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
+                  onClick={handleGenerateAiTags}
+                  disabled={isGeneratingTags}
+                  title={t("memo.generate-ai-tags")}
+                >
+                  {isGeneratingTags ? (
+                    <Loader2Icon className="w-3.5 h-auto animate-spin" />
+                  ) : (
+                    <WandSparklesIcon className="w-3.5 h-auto" />
+                  )}
+                </button>
+              )}
             </div>
             <div className="w-full flex flex-row flex-wrap gap-2">
               {aiTags.map((tag) => {

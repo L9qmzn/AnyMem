@@ -165,6 +165,7 @@
     "preserve-inline-tags": "Preserve inline #tags",
     "show-ai-tags": "Show AI tags",
     "ai-tags": "AI tags",
+    "generate-ai-tags": "Generate AI tags",
     "order-by": "Order By",
     "remove-completed-task-list-items": "Remove done",
     "remove-completed-task-list-items-confirm": "Are you sure you want to remove all completed to-dos? THIS ACTION IS IRREVERSIBLE",
@@ -183,6 +184,8 @@
     "masonry": "Masonry"
   },
   "message": {
+    "ai-tags-generated": "AI tags generated successfully",
+    "no-ai-tags-generated": "No new AI tags generated",
     "archived-successfully": "Archived successfully",
     "change-memo-created-time": "Change memo created time",
     "copied": "Copied",

@@ -103,6 +103,14 @@ service MemoService {
     option (google.api.http) = {delete: "/api/v1/{name=reactions/*}"};
     option (google.api.method_signature) = "name";
   }
+  // GenerateAiTags generates AI tags for a memo.
+  rpc GenerateAiTags(GenerateAiTagsRequest) returns (GenerateAiTagsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/{name=memos/*}/ai-tags:generate"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+  }
 }
 
 enum Visibility {
@@ -509,4 +517,17 @@ message DeleteMemoReactionRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {type: "memos.api.v1/Reaction"}
   ];
+}
+message GenerateAiTagsRequest {
+  // Required. The resource name of the memo.
+  // Format: memos/{memo}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "memos.api.v1/Memo"}
+  ];
+}
+
+message GenerateAiTagsResponse {
+  // The generated AI tags.
+  repeated string tags = 1;
 }

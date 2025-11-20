@@ -46,12 +46,8 @@ func (s *APIV1Service) convertMemoFromStore(ctx context.Context, memo *store.Mem
 			sanitizedTags[i] = util.SanitizeUTF8(tag)
 		}
 		memoMessage.Tags = sanitizedTags
-		aiTags := memo.Payload.AiTags
-		if len(aiTags) == 0 {
-			aiTags = []string{"AI 测试标签"}
-		}
-		sanitizedAiTags := make([]string, len(aiTags))
-		for i, tag := range aiTags {
+		sanitizedAiTags := make([]string, len(memo.Payload.AiTags))
+		for i, tag := range memo.Payload.AiTags {
 			sanitizedAiTags[i] = util.SanitizeUTF8(tag)
 		}
 		memoMessage.AiTags = sanitizedAiTags

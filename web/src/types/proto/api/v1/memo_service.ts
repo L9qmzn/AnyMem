@@ -440,6 +440,19 @@ export interface DeleteMemoReactionRequest {
   name: string;
 }
 
+export interface GenerateAiTagsRequest {
+  /**
+   * Required. The resource name of the memo.
+   * Format: memos/{memo}
+   */
+  name: string;
+}
+
+export interface GenerateAiTagsResponse {
+  /** The generated AI tags. */
+  tags: string[];
+}
+
 function createBaseReaction(): Reaction {
   return { name: "", creator: "", contentId: "", reactionType: "", createTime: undefined };
 }
@@ -2317,6 +2330,98 @@ export const DeleteMemoReactionRequest: MessageFns<DeleteMemoReactionRequest> = 
   },
 };
 
+function createBaseGenerateAiTagsRequest(): GenerateAiTagsRequest {
+  return { name: "" };
+}
+
+export const GenerateAiTagsRequest: MessageFns<GenerateAiTagsRequest> = {
+  encode(message: GenerateAiTagsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GenerateAiTagsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGenerateAiTagsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<GenerateAiTagsRequest>): GenerateAiTagsRequest {
+    return GenerateAiTagsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GenerateAiTagsRequest>): GenerateAiTagsRequest {
+    const message = createBaseGenerateAiTagsRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
+function createBaseGenerateAiTagsResponse(): GenerateAiTagsResponse {
+  return { tags: [] };
+}
+
+export const GenerateAiTagsResponse: MessageFns<GenerateAiTagsResponse> = {
+  encode(message: GenerateAiTagsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.tags) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GenerateAiTagsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGenerateAiTagsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.tags.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<GenerateAiTagsResponse>): GenerateAiTagsResponse {
+    return GenerateAiTagsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GenerateAiTagsResponse>): GenerateAiTagsResponse {
+    const message = createBaseGenerateAiTagsResponse();
+    message.tags = object.tags?.map((e) => e) || [];
+    return message;
+  },
+};
+
 export type MemoServiceDefinition = typeof MemoServiceDefinition;
 export const MemoServiceDefinition = {
   name: "MemoService",
@@ -2989,6 +3094,68 @@ export const MemoServiceDefinition = {
               47,
               42,
               125,
+            ]),
+          ],
+        },
+      },
+    },
+    /** GenerateAiTags generates AI tags for a memo. */
+    generateAiTags: {
+      name: "GenerateAiTags",
+      requestType: GenerateAiTagsRequest,
+      requestStream: false,
+      responseType: GenerateAiTagsResponse,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          8410: [new Uint8Array([4, 110, 97, 109, 101])],
+          578365826: [
+            new Uint8Array([
+              44,
+              58,
+              1,
+              42,
+              34,
+              39,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              123,
+              110,
+              97,
+              109,
+              101,
+              61,
+              109,
+              101,
+              109,
+              111,
+              115,
+              47,
+              42,
+              125,
+              47,
+              97,
+              105,
+              45,
+              116,
+              97,
+              103,
+              115,
+              58,
+              103,
+              101,
+              110,
+              101,
+              114,
+              97,
+              116,
+              101,
             ]),
           ],
         },
