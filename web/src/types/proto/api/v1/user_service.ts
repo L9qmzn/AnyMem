@@ -330,6 +330,8 @@ export interface UserSetting_GeneralSetting {
    * If not set, the default theme will be used.
    */
   theme: string;
+  /** Whether to automatically generate AI tags when saving a memo. */
+  autoGenerateTags: boolean;
 }
 
 /** User authentication sessions configuration. */
@@ -1842,7 +1844,7 @@ export const UserSetting: MessageFns<UserSetting> = {
 };
 
 function createBaseUserSetting_GeneralSetting(): UserSetting_GeneralSetting {
-  return { locale: "", memoVisibility: "", theme: "" };
+  return { locale: "", memoVisibility: "", theme: "", autoGenerateTags: false };
 }
 
 export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> = {
@@ -1855,6 +1857,9 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
     }
     if (message.theme !== "") {
       writer.uint32(34).string(message.theme);
+    }
+    if (message.autoGenerateTags !== false) {
+      writer.uint32(40).bool(message.autoGenerateTags);
     }
     return writer;
   },
@@ -1890,6 +1895,14 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
           message.theme = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.autoGenerateTags = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1907,6 +1920,7 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
     message.locale = object.locale ?? "";
     message.memoVisibility = object.memoVisibility ?? "";
     message.theme = object.theme ?? "";
+    message.autoGenerateTags = object.autoGenerateTags ?? false;
     return message;
   },
 };

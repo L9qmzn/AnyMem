@@ -2981,6 +2981,9 @@ components:
                 theme:
                     type: string
                     description: "The preferred theme of the user.\r\n This references a CSS file in the web/public/themes/ directory.\r\n If not set, the default theme will be used."
+                autoGenerateTags:
+                    type: boolean
+                    description: Whether to automatically generate AI tags when saving a memo.
             description: General user settings configuration.
         UserSetting_SessionsSetting:
             type: object

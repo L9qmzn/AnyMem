@@ -318,6 +318,12 @@
       "default-memo-visibility": "默认备忘录可见性",
       "theme": "主题"
     },
+    "ai": "AI",
+    "ai-section": {
+      "title": "AI 设置",
+      "auto-generate-tags": "自动生成标签",
+      "auto-generate-tags-description": "保存备忘录时自动生成 AI 标签"
+    },
     "sso": "单点登录",
     "sso-section": {
       "authorization-endpoint": "授权端点（Authorization Endpoint）",

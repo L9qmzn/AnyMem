@@ -115,6 +115,34 @@ const memoStore = (() => {
     });
     // Refresh user stats to update tag counts
     userStore.fetchUserStats().catch(console.error);
+
+    // Auto-generate AI tags if enabled in user settings
+    if (userStore.state.userGeneralSetting?.autoGenerateTags) {
+      try {
+        const response = await memoServiceClient.generateAiTags({
+          name: memo.name,
+        });
+        if (response.tags && response.tags.length > 0) {
+          // Update memo with generated tags
+          const updatedMemo = await memoServiceClient.updateMemo({
+            memo: {
+              name: memo.name,
+              aiTags: response.tags,
+            },
+            updateMask: ["ai_tags"],
+          });
+          memoMap[memo.name] = updatedMemo;
+          state.setPartial({
+            stateId: uniqueId(),
+            memoMapByName: { ...memoMap },
+          });
+        }
+      } catch (error) {
+        // Silently fail for auto-generation, don't block memo creation
+        console.error("Failed to auto-generate AI tags:", error);
+      }
+    }
+
     return memo;
   };
 

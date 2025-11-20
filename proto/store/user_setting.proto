@@ -41,6 +41,8 @@ message GeneralUserSetting {
   // The user's theme preference.
   // This references a CSS file in the web/public/themes/ directory.
   string theme = 3;
+  // Whether to automatically generate AI tags when saving a memo.
+  bool auto_generate_tags = 4;
 }
 
 message SessionsUserSetting {
