@@ -48,11 +48,16 @@ func (s *APIV1Service) GenerateAiTags(ctx context.Context, request *v1pb.Generat
 		return nil, status.Errorf(codes.Internal, "failed to list user memos: %v", err)
 	}
 
-	// Collect all unique tags from user's memos
+	// Collect all unique tags from user's memos (including both manual tags and AI tags)
 	tagSet := make(map[string]bool)
 	for _, m := range userMemos {
 		if m.Payload != nil {
+			// Add manual tags
 			for _, tag := range m.Payload.Tags {
+				tagSet[tag] = true
+			}
+			// Add AI-generated tags
+			for _, tag := range m.Payload.AiTags {
 				tagSet[tag] = true
 			}
 		}
