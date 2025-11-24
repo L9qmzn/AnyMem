@@ -339,10 +339,12 @@ func (s *APIV1Service) DeleteUser(ctx context.Context, request *v1pb.DeleteUserR
 
 func getDefaultUserGeneralSetting() *v1pb.UserSetting_GeneralSetting {
 	return &v1pb.UserSetting_GeneralSetting{
-		Locale:           "en",
-		MemoVisibility:   "PRIVATE",
-		Theme:            "",
-		AutoGenerateTags: false,
+		Locale:            "en",
+		MemoVisibility:    "PRIVATE",
+		Theme:             "",
+		AutoGenerateTags:  false,
+		AutoGenerateIndex: false,
+		EnableAiSearch:    false,
 	}
 }
 
@@ -431,10 +433,12 @@ func (s *APIV1Service) UpdateUserSetting(ctx context.Context, request *v1pb.Upda
 	}
 
 	updatedGeneral := &v1pb.UserSetting_GeneralSetting{
-		MemoVisibility:   generalSetting.GetMemoVisibility(),
-		Locale:           generalSetting.GetLocale(),
-		Theme:            generalSetting.GetTheme(),
-		AutoGenerateTags: generalSetting.GetAutoGenerateTags(),
+		MemoVisibility:    generalSetting.GetMemoVisibility(),
+		Locale:            generalSetting.GetLocale(),
+		Theme:             generalSetting.GetTheme(),
+		AutoGenerateTags:  generalSetting.GetAutoGenerateTags(),
+		AutoGenerateIndex: generalSetting.GetAutoGenerateIndex(),
+		EnableAiSearch:    generalSetting.GetEnableAiSearch(),
 	}
 
 	// Apply updates for fields specified in the update mask
@@ -449,6 +453,10 @@ func (s *APIV1Service) UpdateUserSetting(ctx context.Context, request *v1pb.Upda
 			updatedGeneral.Locale = incomingGeneral.Locale
 		case "autoGenerateTags":
 			updatedGeneral.AutoGenerateTags = incomingGeneral.AutoGenerateTags
+		case "autoGenerateIndex":
+			updatedGeneral.AutoGenerateIndex = incomingGeneral.AutoGenerateIndex
+		case "enableAiSearch":
+			updatedGeneral.EnableAiSearch = incomingGeneral.EnableAiSearch
 		default:
 			// Ignore unsupported fields
 		}
@@ -1299,10 +1307,12 @@ func convertUserSettingFromStore(storeSetting *storepb.UserSetting, userID int32
 		if general := storeSetting.GetGeneral(); general != nil {
 			setting.Value = &v1pb.UserSetting_GeneralSetting_{
 				GeneralSetting: &v1pb.UserSetting_GeneralSetting{
-					Locale:           general.Locale,
-					MemoVisibility:   general.MemoVisibility,
-					Theme:            general.Theme,
-					AutoGenerateTags: general.AutoGenerateTags,
+					Locale:            general.Locale,
+					MemoVisibility:    general.MemoVisibility,
+					Theme:             general.Theme,
+					AutoGenerateTags:  general.AutoGenerateTags,
+					AutoGenerateIndex: general.AutoGenerateIndex,
+					EnableAiSearch:    general.EnableAiSearch,
 				},
 			}
 		} else {
@@ -1388,10 +1398,12 @@ func convertUserSettingToStore(apiSetting *v1pb.UserSetting, userID int32, key s
 		if general := apiSetting.GetGeneralSetting(); general != nil {
 			storeSetting.Value = &storepb.UserSetting_General{
 				General: &storepb.GeneralUserSetting{
-					Locale:           general.Locale,
-					MemoVisibility:   general.MemoVisibility,
-					Theme:            general.Theme,
-					AutoGenerateTags: general.AutoGenerateTags,
+					Locale:            general.Locale,
+					MemoVisibility:    general.MemoVisibility,
+					Theme:             general.Theme,
+					AutoGenerateTags:  general.AutoGenerateTags,
+					AutoGenerateIndex: general.AutoGenerateIndex,
+					EnableAiSearch:    general.EnableAiSearch,
 				},
 			}
 		} else {

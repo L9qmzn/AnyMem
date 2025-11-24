@@ -242,8 +242,12 @@ type GeneralUserSetting struct {
 	Theme string `protobuf:"bytes,3,opt,name=theme,proto3" json:"theme,omitempty"`
 	// Whether to automatically generate AI tags when saving a memo.
 	AutoGenerateTags bool `protobuf:"varint,4,opt,name=auto_generate_tags,json=autoGenerateTags,proto3" json:"auto_generate_tags,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Whether to automatically generate vector index when creating/updating/deleting a memo.
+	AutoGenerateIndex bool `protobuf:"varint,5,opt,name=auto_generate_index,json=autoGenerateIndex,proto3" json:"auto_generate_index,omitempty"`
+	// Whether to enable AI-powered semantic search instead of traditional keyword search.
+	EnableAiSearch bool `protobuf:"varint,6,opt,name=enable_ai_search,json=enableAiSearch,proto3" json:"enable_ai_search,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *GeneralUserSetting) Reset() {
@@ -300,6 +304,20 @@ func (x *GeneralUserSetting) GetTheme() string {
 func (x *GeneralUserSetting) GetAutoGenerateTags() bool {
 	if x != nil {
 		return x.AutoGenerateTags
+	}
+	return false
+}
+
+func (x *GeneralUserSetting) GetAutoGenerateIndex() bool {
+	if x != nil {
+		return x.AutoGenerateIndex
+	}
+	return false
+}
+
+func (x *GeneralUserSetting) GetEnableAiSearch() bool {
+	if x != nil {
+		return x.EnableAiSearch
 	}
 	return false
 }
@@ -832,12 +850,14 @@ const file_store_user_setting_proto_rawDesc = "" +
 	"\rACCESS_TOKENS\x10\x03\x12\r\n" +
 	"\tSHORTCUTS\x10\x04\x12\f\n" +
 	"\bWEBHOOKS\x10\x05B\a\n" +
-	"\x05value\"\x99\x01\n" +
+	"\x05value\"\xf3\x01\n" +
 	"\x12GeneralUserSetting\x12\x16\n" +
 	"\x06locale\x18\x01 \x01(\tR\x06locale\x12'\n" +
 	"\x0fmemo_visibility\x18\x02 \x01(\tR\x0ememoVisibility\x12\x14\n" +
 	"\x05theme\x18\x03 \x01(\tR\x05theme\x12,\n" +
-	"\x12auto_generate_tags\x18\x04 \x01(\bR\x10autoGenerateTags\"\xf3\x03\n" +
+	"\x12auto_generate_tags\x18\x04 \x01(\bR\x10autoGenerateTags\x12.\n" +
+	"\x13auto_generate_index\x18\x05 \x01(\bR\x11autoGenerateIndex\x12(\n" +
+	"\x10enable_ai_search\x18\x06 \x01(\bR\x0eenableAiSearch\"\xf3\x03\n" +
 	"\x13SessionsUserSetting\x12D\n" +
 	"\bsessions\x18\x01 \x03(\v2(.memos.store.SessionsUserSetting.SessionR\bsessions\x1a\xfd\x01\n" +
 	"\aSession\x12\x1d\n" +

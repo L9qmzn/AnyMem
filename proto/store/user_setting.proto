@@ -43,6 +43,10 @@ message GeneralUserSetting {
   string theme = 3;
   // Whether to automatically generate AI tags when saving a memo.
   bool auto_generate_tags = 4;
+  // Whether to automatically generate vector index when creating/updating/deleting a memo.
+  bool auto_generate_index = 5;
+  // Whether to enable AI-powered semantic search instead of traditional keyword search.
+  bool enable_ai_search = 6;
 }
 
 message SessionsUserSetting {

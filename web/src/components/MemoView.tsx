@@ -1,9 +1,19 @@
-import { BookmarkIcon, EyeOffIcon, HashIcon, Loader2Icon, MessageCircleMoreIcon, SparklesIcon, WandSparklesIcon } from "lucide-react";
+import {
+  BookmarkIcon,
+  DatabaseIcon,
+  EyeOffIcon,
+  HashIcon,
+  Loader2Icon,
+  MessageCircleMoreIcon,
+  SparklesIcon,
+  WandSparklesIcon,
+} from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useLocation } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { aiServiceClient, MemoIndexInfo } from "@/helpers/ai-service";
 import useAsyncEffect from "@/hooks/useAsyncEffect";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useNavigateTo from "@/hooks/useNavigateTo";
@@ -93,6 +103,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
   });
   const [shortcutActive, setShortcutActive] = useState(false);
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
+  const [indexInfo, setIndexInfo] = useState<MemoIndexInfo | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const instanceMemoRelatedSetting = instanceStore.state.memoRelatedSetting;
   const referencedMemos = memo.relations.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
@@ -120,6 +131,12 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
     const user = await userStore.getOrFetchUserByName(memo.creator);
     setCreator(user);
   }, []);
+
+  // Check memo index status
+  useAsyncEffect(async () => {
+    const info = await aiServiceClient.getMemoIndexInfo(memo.name);
+    setIndexInfo(info);
+  }, [memo.name]);
 
   const handleGotoMemoDetailPage = useCallback(() => {
     navigateTo(`/${memo.name}`, {
@@ -418,6 +435,26 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{t("common.unpin")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {indexInfo && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-default">
+                    <DatabaseIcon
+                      className={cn("w-4 h-auto", indexInfo.indexed ? "text-green-500" : "text-muted-foreground/30")}
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {indexInfo.indexed
+                      ? `${t("memo.indexed")} (T:${indexInfo.text_vectors}, I:${indexInfo.image_vectors})`
+                      : t("memo.not-indexed")}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

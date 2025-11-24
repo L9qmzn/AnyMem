@@ -68,3 +68,5 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
+    index_ready: bool = False
+    total_indexed_memos: int = 0

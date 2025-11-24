@@ -5,6 +5,7 @@ import {
   BookmarkMinusIcon,
   BookmarkPlusIcon,
   CopyIcon,
+  DatabaseIcon,
   Edit3Icon,
   FileTextIcon,
   LinkIcon,
@@ -18,6 +19,7 @@ import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import useNavigateTo from "@/hooks/useNavigateTo";
+import { aiServiceClient } from "@/helpers/ai-service";
 import { instanceStore, memoStore, userStore } from "@/store";
 import { State } from "@/types/proto/api/v1/common";
 import { Memo } from "@/types/proto/api/v1/memo_service";
@@ -52,6 +54,7 @@ const MemoActionMenu = observer((props: Props) => {
   const navigateTo = useNavigateTo();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [removeTasksDialogOpen, setRemoveTasksDialogOpen] = useState(false);
+  const [isIndexing, setIsIndexing] = useState(false);
   const hasCompletedTaskList = checkHasCompletedTaskList(memo);
   const isInMemoDetailPage = location.pathname.startsWith(`/${memo.name}`);
   const isComment = Boolean(memo.parent);
@@ -161,6 +164,20 @@ const MemoActionMenu = observer((props: Props) => {
     memoUpdatedCallback();
   };
 
+  const handleGenerateIndex = async () => {
+    setIsIndexing(true);
+    try {
+      await aiServiceClient.indexMemo(memo);
+      // 异步处理，显示"正在构建索引"而不是"成功"
+      toast.success(t("memo.index-building"));
+    } catch (error) {
+      toast.error("Failed to generate index");
+      console.error(error);
+    } finally {
+      setIsIndexing(false);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -200,6 +217,12 @@ const MemoActionMenu = observer((props: Props) => {
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
+        )}
+        {!isArchived && !isComment && (
+          <DropdownMenuItem onClick={handleGenerateIndex} disabled={isIndexing}>
+            <DatabaseIcon className="w-4 h-auto" />
+            {isIndexing ? t("memo.generating-index") : t("memo.generate-index")}
+          </DropdownMenuItem>
         )}
         {!readonly && (
           <>

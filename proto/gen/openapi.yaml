@@ -2984,6 +2984,12 @@ components:
                 autoGenerateTags:
                     type: boolean
                     description: Whether to automatically generate AI tags when saving a memo.
+                autoGenerateIndex:
+                    type: boolean
+                    description: Whether to automatically generate vector index when creating/updating/deleting a memo.
+                enableAiSearch:
+                    type: boolean
+                    description: Whether to enable AI-powered semantic search instead of traditional keyword search.
             description: General user settings configuration.
         UserSetting_SessionsSetting:
             type: object

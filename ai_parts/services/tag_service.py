@@ -5,8 +5,8 @@ import re
 from typing import List, Dict, Any
 from openai import AsyncOpenAI
 
-from config import get_settings
-from models import Memo, Attachment
+from ai_parts.config import get_settings
+from ai_parts.models import Attachment, Memo
 
 
 settings = get_settings()

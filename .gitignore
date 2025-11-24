@@ -7,6 +7,11 @@ web/dist
 # Build artifacts
 build/
 bin/
+memos
+memos.exe
+memos.exe~
+mcp-server.exe
+mcp-server.exe~
 
 .DS_Store
 
@@ -20,3 +25,34 @@ dist
 
 # VSCode settings
 .vscode
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# AI Parts - Local config with secrets
+ai_parts/config_local.py
+ai_parts/config_dev.py
+ai_parts/.memo_indexes/
+
+# Index data
+.memo_indexes/
+.thumbnail_cache/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Claude
+.claude/
+
+# Test artifacts
+dev_tests/__pycache__/
+dev_tests/.memo_indexes/
+
+# Misc
+nul
+%USERPROFILE%/

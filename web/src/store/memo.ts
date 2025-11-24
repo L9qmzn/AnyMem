@@ -3,6 +3,7 @@ import { makeAutoObservable } from "mobx";
 import { memoServiceClient } from "@/grpcweb";
 import { CreateMemoRequest, ListMemosRequest, Memo } from "@/types/proto/api/v1/memo_service";
 import { createRequestKey, RequestDeduplicator, StoreError } from "./store-utils";
+import { indexMemoIfEnabled, deleteMemoIndexIfEnabled } from "@/helpers/ai-service";
 import userStore from "./user";
 
 class LocalState {
@@ -143,6 +144,9 @@ const memoStore = (() => {
       }
     }
 
+    // Auto-index memo if enabled in user settings
+    indexMemoIfEnabled(memo, userStore.state.userGeneralSetting);
+
     return memo;
   };
 
@@ -175,6 +179,10 @@ const memoStore = (() => {
       });
       // Refresh user stats to update tag counts
       userStore.fetchUserStats().catch(console.error);
+
+      // Auto-index updated memo if enabled in user settings
+      indexMemoIfEnabled(memo, userStore.state.userGeneralSetting);
+
       return memo;
     } catch (error) {
       // Rollback on error
@@ -192,6 +200,9 @@ const memoStore = (() => {
     await memoServiceClient.deleteMemo({
       name,
     });
+
+    // Auto-delete memo index if enabled in user settings
+    deleteMemoIndexIfEnabled(name, userStore.state.userGeneralSetting);
 
     const memoMap = { ...state.memoMapByName };
     delete memoMap[name];

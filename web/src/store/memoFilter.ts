@@ -22,7 +22,8 @@ export type FilterFactor =
   | "pinned" // Show only pinned memos
   | "property.hasLink" // Memos containing links
   | "property.hasTaskList" // Memos with task lists
-  | "property.hasCode"; // Memos with code blocks
+  | "property.hasCode" // Memos with code blocks
+  | "aiSearchResults"; // AI search results (list of memo names)
 
 /**
  * Memo filter object

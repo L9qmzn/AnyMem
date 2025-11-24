@@ -434,6 +434,10 @@ message UserSetting {
     string theme = 4 [(google.api.field_behavior) = OPTIONAL];
     // Whether to automatically generate AI tags when saving a memo.
     bool auto_generate_tags = 5 [(google.api.field_behavior) = OPTIONAL];
+    // Whether to automatically generate vector index when creating/updating/deleting a memo.
+    bool auto_generate_index = 6 [(google.api.field_behavior) = OPTIONAL];
+    // Whether to enable AI-powered semantic search instead of traditional keyword search.
+    bool enable_ai_search = 7 [(google.api.field_behavior) = OPTIONAL];
   }
 
   // User authentication sessions configuration.

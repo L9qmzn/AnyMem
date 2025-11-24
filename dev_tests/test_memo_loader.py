@@ -80,7 +80,7 @@ def demo_first_memo():
 
     client = MemoLoaderClient(base_url, auth_token, session_cookie)
 
-    status, data = client.list_memos(page_size=10)
+    status, data = client.list_memos(page_size=5)
     if status != 200 or not isinstance(data, dict) or not data.get("memos"):
         print(f"Failed to list memos: {status} {data}")
         return

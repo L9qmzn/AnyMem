@@ -332,6 +332,10 @@ export interface UserSetting_GeneralSetting {
   theme: string;
   /** Whether to automatically generate AI tags when saving a memo. */
   autoGenerateTags: boolean;
+  /** Whether to automatically generate vector index when creating/updating/deleting a memo. */
+  autoGenerateIndex: boolean;
+  /** Whether to enable AI-powered semantic search instead of traditional keyword search. */
+  enableAiSearch: boolean;
 }
 
 /** User authentication sessions configuration. */
@@ -1844,7 +1848,14 @@ export const UserSetting: MessageFns<UserSetting> = {
 };
 
 function createBaseUserSetting_GeneralSetting(): UserSetting_GeneralSetting {
-  return { locale: "", memoVisibility: "", theme: "", autoGenerateTags: false };
+  return {
+    locale: "",
+    memoVisibility: "",
+    theme: "",
+    autoGenerateTags: false,
+    autoGenerateIndex: false,
+    enableAiSearch: false,
+  };
 }
 
 export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> = {
@@ -1860,6 +1871,12 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
     }
     if (message.autoGenerateTags !== false) {
       writer.uint32(40).bool(message.autoGenerateTags);
+    }
+    if (message.autoGenerateIndex !== false) {
+      writer.uint32(48).bool(message.autoGenerateIndex);
+    }
+    if (message.enableAiSearch !== false) {
+      writer.uint32(56).bool(message.enableAiSearch);
     }
     return writer;
   },
@@ -1903,6 +1920,22 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
           message.autoGenerateTags = reader.bool();
           continue;
         }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.autoGenerateIndex = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.enableAiSearch = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1921,6 +1954,8 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
     message.memoVisibility = object.memoVisibility ?? "";
     message.theme = object.theme ?? "";
     message.autoGenerateTags = object.autoGenerateTags ?? false;
+    message.autoGenerateIndex = object.autoGenerateIndex ?? false;
+    message.enableAiSearch = object.enableAiSearch ?? false;
     return message;
   },
 };

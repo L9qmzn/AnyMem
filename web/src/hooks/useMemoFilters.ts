@@ -106,7 +106,23 @@ export const useMemoFilters = (options: UseMemoFiltersOptions = {}): string | un
     // Add active filters from memoFilterStore
     for (const filter of memoFilterStore.filters) {
       if (filter.factor === "contentSearch") {
-        conditions.push(`content.contains("${filter.value}")`);
+        // Skip AI search placeholder (starts with 🔍)
+        if (!filter.value.startsWith("🔍")) {
+          conditions.push(`content.contains("${filter.value}")`);
+        }
+      } else if (filter.factor === "aiSearchResults") {
+        // AI search results: filter by memo UIDs
+        // value format: "memos/uid1,memos/uid2,memos/uid3"
+        const memoNames = filter.value.split(",").filter((n) => n.length > 0);
+        if (memoNames.length > 0) {
+          // Extract UID from memo name (format: "memos/uid")
+          const uids = memoNames.map((n) => {
+            const parts = n.split("/");
+            return parts.length === 2 ? parts[1] : n;
+          });
+          const uidList = uids.map((uid) => `"${uid}"`).join(", ");
+          conditions.push(`uid in [${uidList}]`);
+        }
       } else if (filter.factor === "tagSearch") {
         // Search in both regular tags and AI tags
         conditions.push(`(tag in ["${filter.value}"] || ai_tag in ["${filter.value}"])`);
