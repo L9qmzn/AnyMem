@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { viewStore } from "@/store";
+import { userStore, viewStore } from "@/store";
 import { useTranslate } from "@/utils/i18n";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
@@ -13,11 +13,17 @@ interface Props {
 
 const MemoDisplaySettingMenu = observer(({ className }: Props) => {
   const t = useTranslate();
+  const isAiSearchEnabled = userStore.state.userGeneralSetting?.enableAiSearch || false;
   const isApplying =
     viewStore.state.orderByTimeAsc !== false ||
     viewStore.state.layout !== "LIST" ||
     viewStore.state.preserveInlineTags !== true ||
-    viewStore.state.showAiTags !== true;
+    viewStore.state.showAiTags !== true ||
+    isAiSearchEnabled;
+
+  const handleEnableAiSearchChange = async (checked: boolean) => {
+    await userStore.updateUserGeneralSetting({ enableAiSearch: checked }, ["enableAiSearch"]);
+  };
 
   return (
     <Popover>
@@ -85,6 +91,10 @@ const MemoDisplaySettingMenu = observer(({ className }: Props) => {
                 })
               }
             />
+          </div>
+          <div className="w-full flex flex-row justify-between items-center">
+            <span className="text-sm shrink-0 mr-3 text-foreground">{t("setting.ai-section.enable-ai-search")}</span>
+            <Switch checked={isAiSearchEnabled} onCheckedChange={handleEnableAiSearchChange} />
           </div>
         </div>
       </PopoverContent>

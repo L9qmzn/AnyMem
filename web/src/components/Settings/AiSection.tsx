@@ -65,10 +65,6 @@ const AiSection = observer(() => {
     await userStore.updateUserGeneralSetting({ autoGenerateIndex: checked }, ["autoGenerateIndex"]);
   };
 
-  const handleEnableAiSearchChange = async (checked: boolean) => {
-    await userStore.updateUserGeneralSetting({ enableAiSearch: checked }, ["enableAiSearch"]);
-  };
-
   const pollRebuildStatus = async (creator: string) => {
     try {
       const status = await aiServiceClient.getRebuildStatus(creator);
@@ -134,7 +130,6 @@ const AiSection = observer(() => {
     theme: "system",
     autoGenerateTags: false,
     autoGenerateIndex: false,
-    enableAiSearch: false,
   };
 
   return (
@@ -160,9 +155,6 @@ const AiSection = observer(() => {
         </SettingRow>
         <SettingRow label={t("setting.ai-section.auto-generate-index")} description={t("setting.ai-section.auto-generate-index-description")}>
           <Switch checked={setting.autoGenerateIndex || false} onCheckedChange={handleAutoGenerateIndexChange} />
-        </SettingRow>
-        <SettingRow label={t("setting.ai-section.enable-ai-search")} description={t("setting.ai-section.enable-ai-search-description")}>
-          <Switch checked={setting.enableAiSearch || false} onCheckedChange={handleEnableAiSearchChange} />
         </SettingRow>
         <SettingRow
           label={t("setting.ai-section.rebuild-index")}

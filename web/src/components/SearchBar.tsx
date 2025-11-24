@@ -1,4 +1,4 @@
-import { SearchIcon, SparklesIcon } from "lucide-react";
+import { LoaderIcon, SearchIcon, SparklesIcon } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -139,14 +139,14 @@ const SearchBar = observer(() => {
   return (
     <div className="relative w-full h-auto flex flex-row justify-start items-center">
       {isAiSearchEnabled ? (
-        <SparklesIcon className="absolute left-2 w-4 h-auto opacity-60 text-purple-500" />
+        <SparklesIcon className="absolute left-2 w-4 h-auto opacity-60 text-primary" />
       ) : (
         <SearchIcon className="absolute left-2 w-4 h-auto opacity-40 text-sidebar-foreground" />
       )}
       <input
         className={cn(
           "w-full text-sidebar-foreground leading-6 bg-sidebar border text-sm rounded-lg p-1 pl-8 outline-0",
-          isAiSearchEnabled ? "border-purple-500/30" : "border-border",
+          isAiSearchEnabled ? "border-primary/30" : "border-border",
         )}
         placeholder={isAiSearchEnabled ? t("memo.ai-search-placeholder") : t("memo.search-placeholder")}
         value={queryText}
@@ -155,7 +155,7 @@ const SearchBar = observer(() => {
         disabled={isSearching}
         ref={inputRef}
       />
-      {isSearching && <div className="absolute right-10 top-2 text-sm text-muted-foreground">Searching...</div>}
+      {isSearching && <LoaderIcon className="absolute right-10 w-4 h-4 top-2 animate-spin text-muted-foreground" />}
       <MemoDisplaySettingMenu className="absolute right-2 top-2 text-sidebar-foreground" />
     </div>
   );
