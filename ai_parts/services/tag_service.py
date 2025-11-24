@@ -38,16 +38,7 @@ def build_non_image_attachment_description(
             break
 
         filename = att.filename or "unknown"
-        att_content = att.content or ""
-
-        att_content_snippet = ""
-        if att_content:
-            snippet = att_content.strip().replace("\n", " ")
-            if len(snippet) > 200:
-                snippet = snippet[:200] + "..."
-            att_content_snippet = f"，部分内容预览：{snippet}"
-
-        line = f"{count}) 类型: {att_type}，文件名: {filename}{att_content_snippet}"
+        line = f"{count}) 类型: {att_type}，文件名: {filename}"
         lines.append(line)
 
     return "\n".join(lines) if lines else "无"
@@ -64,7 +55,7 @@ def extract_image_urls(
         if not att_type.startswith("image/"):
             continue
 
-        url = att.externalLink or att.content or ""
+        url = att.externalLink or ""
         if not url:
             continue
 
@@ -117,19 +108,34 @@ async def generate_tags_for_memo(
 【这条备忘录目前已有的标签】
 {", ".join(existing_tags) if existing_tags else "无"}
 
-要求：
-1. 结合正文 + 附件 + 图片的主题来思考，标签可以反映：
-   - 内容主题（如：哲学、论文、工作、旅游、宠物）
-   - 文档或媒体类型（如：论文、截图、合约、照片）
-   - 重要实体（如：柏拉图、公司名称、项目名、地点）
-2. 尽量复用给出的"常用标签"，如果语义接近就直接用已有的标签名。
-3. 每个标签 1～6 个字，必须是**中文或中英文混合**，不要带 # 号。
-4. 不要生成和当前 memo 已有标签完全重复的标签。
-5. 最多生成 {max_tags} 个标签。
-6. 只输出标签本身，用中文或英文逗号分隔，不要任何解释性文字。
+核心原则：
+1. **具体胜过抽象** - 优先提取具体名称：
+   - 宠物名（"小黑"、"旺财"）比类别（"狗"）重要
+   - 产品型号（"iPhone 15"、"MacBook Pro"）比类别（"手机"）重要
+   - 人名（"李总"）、公司名（"阿里"）、书名（"三体"）都要提取
+   - 如果正文有"小黑#狗"，提取"小黑"，不要输出"狗"
 
-输出示例（仅示意）：
-论文, 哲学, 柏拉图
+2. **复用避免碎片** - 标签池里有就用原词：
+   - 池里有"阅读"，就不要写"读书"、"看书"等变体
+   - 池里有"工作"，就不要创造"工作记录"、"工作笔记"
+   - 语义完全相同才复用，不同就创建新的
+
+3. **类型化敏感信息** - 敏感内容标注类型而非具体值：
+   - 银行卡 → 输出"卡号"（不输出具体卡号）
+   - API密钥 → 输出"API Key"（不输出密钥本身）
+   - 密码 → 输出"密码"（不输出密码内容）
+
+4. **控制数量** - 少而精：
+   - 目标 2-3 个标签，最多 {max_tags} 个
+   - 宁缺毋滥，只要最关键的信息
+
+5. **格式要求**：
+   - 每个标签 1～6 个字
+   - 不带 # 号和其他符号
+   - 不要重复已有标签
+   - 只输出标签，逗号分隔，无解释
+
+关键：记住具体名称永远比分类更有价值！
 """
 
     # 使用异步 API 调用
