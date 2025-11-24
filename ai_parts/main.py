@@ -17,6 +17,12 @@ from ai_parts.api import indexing, search, tags
 from ai_parts.config import get_settings
 from ai_parts.core.embeddings import get_jina_embeddings
 from ai_parts.indexing.index_manager import IndexManager, create_index_manager
+from ai_parts.retrieval import list_retrievers
+from ai_parts.retrieval.bm25 import (
+    HAS_BM25,
+    build_bm25_from_index_manager,
+    set_bm25_index,
+)
 
 # 配置日志
 logging.basicConfig(
@@ -69,6 +75,24 @@ async def lifespan(app: FastAPI):
         # 注入索引管理器到各个路由模块
         indexing.set_index_manager(manager)
         search.set_index_manager(manager)
+
+        # 初始化 BM25 索引（可选）
+        if HAS_BM25:
+            try:
+                bm25_index = build_bm25_from_index_manager(manager)
+                set_bm25_index(bm25_index)
+                if bm25_index.is_ready:
+                    logger.info(f"BM25 index built with {len(bm25_index._nodes)} nodes")
+                else:
+                    logger.warning("BM25 index built but empty")
+            except Exception as e:
+                logger.warning(f"BM25 index init failed: {e}")
+        else:
+            logger.info("BM25 not available (install llama-index-retrievers-bm25)")
+
+        # 列出可用的检索策略
+        retrievers = list_retrievers()
+        logger.info(f"Available retrievers: {[r['name'] for r in retrievers]}")
 
     except Exception as e:
         logger.warning(f"Index init failed: {e}")
@@ -148,5 +172,5 @@ if __name__ == "__main__":
         "ai_parts.main:app",
         host=settings.host,
         port=settings.port,
-        reload=True,
+        # reload=True,
     )
