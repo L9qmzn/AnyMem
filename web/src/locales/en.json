@@ -347,6 +347,8 @@
     "ai": "AI",
     "ai-section": {
       "title": "AI Settings",
+      "ai-service-url": "AI Service URL",
+      "ai-service-url-description": "The URL of the AI service (default: http://127.0.0.1:8000)",
       "auto-generate-tags": "Auto-generate tags",
       "auto-generate-tags-description": "Automatically generate AI tags when saving a memo",
       "auto-generate-index": "Auto Generate Index",

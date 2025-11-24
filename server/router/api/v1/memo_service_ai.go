@@ -123,8 +123,14 @@ func (s *APIV1Service) GenerateAiTags(ctx context.Context, request *v1pb.Generat
 		aiReq.Memo.Attachments = append(aiReq.Memo.Attachments, attForAI)
 	}
 
+	// Get AI service URL from instance settings
+	aiSetting, err := s.Store.GetInstanceAiSetting(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get AI settings: %v", err)
+	}
+
 	// Call AI service
-	aiClient := ai.NewClient()
+	aiClient := ai.NewClient(aiSetting.AiServiceUrl)
 	aiResp, err := aiClient.GenerateTags(ctx, aiReq)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to generate AI tags: %v", err)

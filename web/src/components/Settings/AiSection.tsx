@@ -3,8 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { aiServiceClient, RebuildTaskStatus } from "@/helpers/ai-service";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { userStore } from "@/store";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { instanceStore, userStore } from "@/store";
+import { instanceSettingNamePrefix } from "@/store/common";
+import { InstanceSetting_AiSetting, InstanceSetting_Key } from "@/types/proto/api/v1/instance_service";
+import { User_Role } from "@/types/proto/api/v1/user_service";
 import { UserSetting_GeneralSetting } from "@/types/proto/api/v1/user_service";
 import { useTranslate } from "@/utils/i18n";
 import SettingGroup from "./SettingGroup";
@@ -14,9 +19,43 @@ import SettingSection from "./SettingSection";
 const AiSection = observer(() => {
   const t = useTranslate();
   const generalSetting = userStore.state.userGeneralSetting;
+  const currentUser = useCurrentUser();
+  const isHost = currentUser?.role === User_Role.HOST;
   const [isRebuilding, setIsRebuilding] = useState(false);
   const [rebuildStatus, setRebuildStatus] = useState<RebuildTaskStatus | null>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Instance AI settings (only for host)
+  const [aiServiceUrl, setAiServiceUrl] = useState("");
+  const [originalAiServiceUrl, setOriginalAiServiceUrl] = useState("");
+
+  useEffect(() => {
+    if (isHost) {
+      // Fetch AI setting if not already loaded
+      instanceStore.fetchInstanceSetting(InstanceSetting_Key.AI).then(() => {
+        const aiSetting = instanceStore.getInstanceSettingByKey(InstanceSetting_Key.AI)?.aiSetting;
+        const url = aiSetting?.aiServiceUrl || "http://127.0.0.1:8000";
+        setAiServiceUrl(url);
+        setOriginalAiServiceUrl(url);
+      });
+    }
+  }, [isHost]);
+
+  const handleSaveAiServiceUrl = async () => {
+    try {
+      await instanceStore.upsertInstanceSetting({
+        name: `${instanceSettingNamePrefix}${InstanceSetting_Key.AI}`,
+        aiSetting: InstanceSetting_AiSetting.fromPartial({
+          aiServiceUrl: aiServiceUrl,
+        }),
+      });
+      setOriginalAiServiceUrl(aiServiceUrl);
+      toast.success(t("common.updated"));
+    } catch (error) {
+      console.error("Failed to update AI service URL:", error);
+      toast.error(t("common.update-failed"));
+    }
+  };
 
   const handleAutoGenerateTagsChange = async (checked: boolean) => {
     await userStore.updateUserGeneralSetting({ autoGenerateTags: checked }, ["autoGenerateTags"]);
@@ -101,6 +140,21 @@ const AiSection = observer(() => {
   return (
     <SettingSection>
       <SettingGroup title={t("setting.ai-section.title")}>
+        {isHost && (
+          <SettingRow label={t("setting.ai-section.ai-service-url")} description={t("setting.ai-section.ai-service-url-description")}>
+            <div className="flex items-center gap-2">
+              <Input
+                className="w-64"
+                value={aiServiceUrl}
+                onChange={(e) => setAiServiceUrl(e.target.value)}
+                placeholder="http://127.0.0.1:8000"
+              />
+              <Button onClick={handleSaveAiServiceUrl} disabled={aiServiceUrl === originalAiServiceUrl} size="sm">
+                {t("common.save")}
+              </Button>
+            </div>
+          </SettingRow>
+        )}
         <SettingRow label={t("setting.ai-section.auto-generate-tags")} description={t("setting.ai-section.auto-generate-tags-description")}>
           <Switch checked={setting.autoGenerateTags || false} onCheckedChange={handleAutoGenerateTagsChange} />
         </SettingRow>

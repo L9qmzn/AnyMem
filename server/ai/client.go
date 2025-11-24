@@ -17,11 +17,18 @@ type Client struct {
 	httpClient *http.Client
 }
 
+// DefaultAIServiceURL is the default URL for the AI service.
+const DefaultAIServiceURL = "http://127.0.0.1:8000"
+
 // NewClient creates a new AI service client.
-func NewClient() *Client {
-	baseURL := os.Getenv("AI_SERVICE_URL")
+// If aiServiceURL is empty, it falls back to AI_SERVICE_URL env var, then to default.
+func NewClient(aiServiceURL string) *Client {
+	baseURL := aiServiceURL
 	if baseURL == "" {
-		baseURL = "http://127.0.0.1:8001"
+		baseURL = os.Getenv("AI_SERVICE_URL")
+	}
+	if baseURL == "" {
+		baseURL = DefaultAIServiceURL
 	}
 
 	return &Client{

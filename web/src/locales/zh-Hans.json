@@ -328,6 +328,8 @@
     "ai": "AI",
     "ai-section": {
       "title": "AI 设置",
+      "ai-service-url": "AI 服务地址",
+      "ai-service-url-description": "AI 服务的 URL 地址（默认: http://127.0.0.1:8000）",
       "auto-generate-tags": "自动生成标签",
       "auto-generate-tags-description": "保存备忘录时自动生成 AI 标签",
       "auto-generate-index": "自动生成索引",

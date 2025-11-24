@@ -2222,7 +2222,16 @@ components:
                     $ref: '#/components/schemas/InstanceSetting_StorageSetting'
                 memoRelatedSetting:
                     $ref: '#/components/schemas/InstanceSetting_MemoRelatedSetting'
+                aiSetting:
+                    $ref: '#/components/schemas/InstanceSetting_AiSetting'
             description: An instance setting resource.
+        InstanceSetting_AiSetting:
+            type: object
+            properties:
+                aiServiceUrl:
+                    type: string
+                    description: "ai_service_url is the URL of the AI service.\r\n Default: http://127.0.0.1:8000"
+            description: AI-related instance settings configuration.
         InstanceSetting_GeneralSetting:
             type: object
             properties:

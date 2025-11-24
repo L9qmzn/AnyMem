@@ -39,6 +39,7 @@ export interface InstanceSetting {
   generalSetting?: InstanceSetting_GeneralSetting | undefined;
   storageSetting?: InstanceSetting_StorageSetting | undefined;
   memoRelatedSetting?: InstanceSetting_MemoRelatedSetting | undefined;
+  aiSetting?: InstanceSetting_AiSetting | undefined;
 }
 
 /** Enumeration of instance setting keys. */
@@ -50,6 +51,8 @@ export enum InstanceSetting_Key {
   STORAGE = "STORAGE",
   /** MEMO_RELATED - MEMO_RELATED is the key for memo related settings. */
   MEMO_RELATED = "MEMO_RELATED",
+  /** AI - AI is the key for AI related settings. */
+  AI = "AI",
   UNRECOGNIZED = "UNRECOGNIZED",
 }
 
@@ -67,6 +70,9 @@ export function instanceSetting_KeyFromJSON(object: any): InstanceSetting_Key {
     case 3:
     case "MEMO_RELATED":
       return InstanceSetting_Key.MEMO_RELATED;
+    case 4:
+    case "AI":
+      return InstanceSetting_Key.AI;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -84,6 +90,8 @@ export function instanceSetting_KeyToNumber(object: InstanceSetting_Key): number
       return 2;
     case InstanceSetting_Key.MEMO_RELATED:
       return 3;
+    case InstanceSetting_Key.AI:
+      return 4;
     case InstanceSetting_Key.UNRECOGNIZED:
     default:
       return -1;
@@ -232,6 +240,15 @@ export interface InstanceSetting_MemoRelatedSetting {
   nsfwTags: string[];
 }
 
+/** AI-related instance settings configuration. */
+export interface InstanceSetting_AiSetting {
+  /**
+   * ai_service_url is the URL of the AI service.
+   * Default: http://127.0.0.1:8000
+   */
+  aiServiceUrl: string;
+}
+
 /** Request message for GetInstanceSetting method. */
 export interface GetInstanceSettingRequest {
   /**
@@ -368,7 +385,13 @@ export const GetInstanceProfileRequest: MessageFns<GetInstanceProfileRequest> = 
 };
 
 function createBaseInstanceSetting(): InstanceSetting {
-  return { name: "", generalSetting: undefined, storageSetting: undefined, memoRelatedSetting: undefined };
+  return {
+    name: "",
+    generalSetting: undefined,
+    storageSetting: undefined,
+    memoRelatedSetting: undefined,
+    aiSetting: undefined,
+  };
 }
 
 export const InstanceSetting: MessageFns<InstanceSetting> = {
@@ -384,6 +407,9 @@ export const InstanceSetting: MessageFns<InstanceSetting> = {
     }
     if (message.memoRelatedSetting !== undefined) {
       InstanceSetting_MemoRelatedSetting.encode(message.memoRelatedSetting, writer.uint32(34).fork()).join();
+    }
+    if (message.aiSetting !== undefined) {
+      InstanceSetting_AiSetting.encode(message.aiSetting, writer.uint32(42).fork()).join();
     }
     return writer;
   },
@@ -427,6 +453,14 @@ export const InstanceSetting: MessageFns<InstanceSetting> = {
           message.memoRelatedSetting = InstanceSetting_MemoRelatedSetting.decode(reader, reader.uint32());
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.aiSetting = InstanceSetting_AiSetting.decode(reader, reader.uint32());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -450,6 +484,9 @@ export const InstanceSetting: MessageFns<InstanceSetting> = {
       : undefined;
     message.memoRelatedSetting = (object.memoRelatedSetting !== undefined && object.memoRelatedSetting !== null)
       ? InstanceSetting_MemoRelatedSetting.fromPartial(object.memoRelatedSetting)
+      : undefined;
+    message.aiSetting = (object.aiSetting !== undefined && object.aiSetting !== null)
+      ? InstanceSetting_AiSetting.fromPartial(object.aiSetting)
       : undefined;
     return message;
   },
@@ -1041,6 +1078,52 @@ export const InstanceSetting_MemoRelatedSetting: MessageFns<InstanceSetting_Memo
     message.disableMarkdownShortcuts = object.disableMarkdownShortcuts ?? false;
     message.enableBlurNsfwContent = object.enableBlurNsfwContent ?? false;
     message.nsfwTags = object.nsfwTags?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseInstanceSetting_AiSetting(): InstanceSetting_AiSetting {
+  return { aiServiceUrl: "" };
+}
+
+export const InstanceSetting_AiSetting: MessageFns<InstanceSetting_AiSetting> = {
+  encode(message: InstanceSetting_AiSetting, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.aiServiceUrl !== "") {
+      writer.uint32(10).string(message.aiServiceUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): InstanceSetting_AiSetting {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInstanceSetting_AiSetting();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.aiServiceUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<InstanceSetting_AiSetting>): InstanceSetting_AiSetting {
+    return InstanceSetting_AiSetting.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<InstanceSetting_AiSetting>): InstanceSetting_AiSetting {
+    const message = createBaseInstanceSetting_AiSetting();
+    message.aiServiceUrl = object.aiServiceUrl ?? "";
     return message;
   },
 };

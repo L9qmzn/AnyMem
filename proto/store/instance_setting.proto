@@ -14,6 +14,8 @@ enum InstanceSettingKey {
   STORAGE = 3;
   // MEMO_RELATED is the key for memo related settings.
   MEMO_RELATED = 4;
+  // AI is the key for AI related settings.
+  AI = 5;
 }
 
 message InstanceSetting {
@@ -23,6 +25,7 @@ message InstanceSetting {
     InstanceGeneralSetting general_setting = 3;
     InstanceStorageSetting storage_setting = 4;
     InstanceMemoRelatedSetting memo_related_setting = 5;
+    InstanceAiSetting ai_setting = 6;
   }
 }
 
@@ -114,4 +117,10 @@ message InstanceMemoRelatedSetting {
   bool enable_blur_nsfw_content = 9;
   // nsfw_tags is the list of tags that mark content as NSFW for blurring.
   repeated string nsfw_tags = 10;
+}
+
+message InstanceAiSetting {
+  // ai_service_url is the URL of the AI service.
+  // Default: http://127.0.0.1:8000
+  string ai_service_url = 1;
 }

@@ -37,6 +37,8 @@ func (s *Store) UpsertInstanceSetting(ctx context.Context, upsert *storepb.Insta
 		valueBytes, err = protojson.Marshal(upsert.GetStorageSetting())
 	} else if upsert.Key == storepb.InstanceSettingKey_MEMO_RELATED {
 		valueBytes, err = protojson.Marshal(upsert.GetMemoRelatedSetting())
+	} else if upsert.Key == storepb.InstanceSettingKey_AI {
+		valueBytes, err = protojson.Marshal(upsert.GetAiSetting())
 	} else {
 		return nil, errors.Errorf("unsupported instance setting key: %v", upsert.Key)
 	}
@@ -208,6 +210,31 @@ func (s *Store) GetInstanceStorageSetting(ctx context.Context) (*storepb.Instanc
 	return instanceStorageSetting, nil
 }
 
+// DefaultAiServiceURL is the default URL for the AI service.
+const DefaultAiServiceURL = "http://127.0.0.1:8000"
+
+func (s *Store) GetInstanceAiSetting(ctx context.Context) (*storepb.InstanceAiSetting, error) {
+	instanceSetting, err := s.GetInstanceSetting(ctx, &FindInstanceSetting{
+		Name: storepb.InstanceSettingKey_AI.String(),
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get instance AI setting")
+	}
+
+	instanceAiSetting := &storepb.InstanceAiSetting{}
+	if instanceSetting != nil {
+		instanceAiSetting = instanceSetting.GetAiSetting()
+	}
+	if instanceAiSetting.AiServiceUrl == "" {
+		instanceAiSetting.AiServiceUrl = DefaultAiServiceURL
+	}
+	s.instanceSettingCache.Set(ctx, storepb.InstanceSettingKey_AI.String(), &storepb.InstanceSetting{
+		Key:   storepb.InstanceSettingKey_AI,
+		Value: &storepb.InstanceSetting_AiSetting{AiSetting: instanceAiSetting},
+	})
+	return instanceAiSetting, nil
+}
+
 func convertInstanceSettingFromRaw(instanceSettingRaw *InstanceSetting) (*storepb.InstanceSetting, error) {
 	instanceSetting := &storepb.InstanceSetting{
 		Key: storepb.InstanceSettingKey(storepb.InstanceSettingKey_value[instanceSettingRaw.Name]),
@@ -237,6 +264,12 @@ func convertInstanceSettingFromRaw(instanceSettingRaw *InstanceSetting) (*storep
 			return nil, err
 		}
 		instanceSetting.Value = &storepb.InstanceSetting_MemoRelatedSetting{MemoRelatedSetting: memoRelatedSetting}
+	case storepb.InstanceSettingKey_AI.String():
+		aiSetting := &storepb.InstanceAiSetting{}
+		if err := protojsonUnmarshaler.Unmarshal([]byte(instanceSettingRaw.Value), aiSetting); err != nil {
+			return nil, err
+		}
+		instanceSetting.Value = &storepb.InstanceSetting_AiSetting{AiSetting: aiSetting}
 	default:
 		// Skip unsupported instance setting key.
 		return nil, nil
