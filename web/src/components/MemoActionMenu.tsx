@@ -221,7 +221,7 @@ const MemoActionMenu = observer((props: Props) => {
         {!isArchived && !isComment && (
           <DropdownMenuItem onClick={handleGenerateIndex} disabled={isIndexing}>
             <DatabaseIcon className="w-4 h-auto" />
-            {isIndexing ? t("memo.generating-index") : t("memo.generate-index")}
+            {isIndexing ? t("memo.generating-index") : t("memo.reindex")}
           </DropdownMenuItem>
         )}
         {!readonly && (

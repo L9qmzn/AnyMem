@@ -104,6 +104,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
   const [shortcutActive, setShortcutActive] = useState(false);
   const [isGeneratingTags, setIsGeneratingTags] = useState(false);
   const [indexInfo, setIndexInfo] = useState<MemoIndexInfo | null>(null);
+  const [isIndexing, setIsIndexing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const instanceMemoRelatedSetting = instanceStore.state.memoRelatedSetting;
   const referencedMemos = memo.relations.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
@@ -212,6 +213,28 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
       toast.error(error?.details);
     }
   }, [isArchived, memo.name, t, memoStore, userStore]);
+
+  const handleIndexMemo = useCallback(async () => {
+    if (isIndexing || readonly || indexInfo?.indexed) {
+      return;
+    }
+
+    setIsIndexing(true);
+    try {
+      await aiServiceClient.indexMemo(memo);
+      toast.success(t("memo.index-building"));
+      // Refresh index info after a short delay
+      setTimeout(async () => {
+        const info = await aiServiceClient.getMemoIndexInfo(memo.name);
+        setIndexInfo(info);
+        setIsIndexing(false);
+      }, 1000);
+    } catch (error: any) {
+      console.error("Failed to index memo:", error);
+      toast.error(error?.message || "Failed to index memo");
+      setIsIndexing(false);
+    }
+  }, [isIndexing, readonly, indexInfo, memo, t]);
 
   const handleGenerateAiTags = useCallback(async () => {
     if (isGeneratingTags || readonly) {
@@ -443,17 +466,28 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="cursor-default">
-                    <DatabaseIcon
-                      className={cn("w-4 h-auto", indexInfo.indexed ? "text-green-500" : "text-muted-foreground/30")}
-                    />
+                  <span
+                    className={cn(
+                      indexInfo.indexed || readonly ? "cursor-default" : "cursor-pointer hover:opacity-80",
+                    )}
+                    onClick={!indexInfo.indexed && !readonly ? handleIndexMemo : undefined}
+                  >
+                    {isIndexing ? (
+                      <Loader2Icon className="w-4 h-auto text-muted-foreground animate-spin" />
+                    ) : (
+                      <DatabaseIcon
+                        className={cn("w-4 h-auto", indexInfo.indexed ? "text-green-500" : "text-muted-foreground/30")}
+                      />
+                    )}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {indexInfo.indexed
-                      ? `${t("memo.indexed")} (T:${indexInfo.text_vectors}, I:${indexInfo.image_vectors})`
-                      : t("memo.not-indexed")}
+                    {isIndexing
+                      ? t("memo.generating-index")
+                      : indexInfo.indexed
+                        ? `${t("memo.indexed")} (T:${indexInfo.text_vectors}, I:${indexInfo.image_vectors})`
+                        : t("memo.click-to-index")}
                   </p>
                 </TooltipContent>
               </Tooltip>

@@ -164,6 +164,8 @@
     "index-building": "正在构建索引...",
     "indexed": "已索引",
     "not-indexed": "未索引",
+    "reindex": "重新索引",
+    "click-to-index": "点击生成索引",
     "order-by": "排序",
     "remove-completed-task-list-items": "移除已办",
     "remove-completed-task-list-items-confirm": "您确定要移除所有完成的待办吗？（此操作不可逆）",

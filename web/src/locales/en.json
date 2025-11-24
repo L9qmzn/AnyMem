@@ -172,6 +172,8 @@
     "index-building": "Building index...",
     "indexed": "Indexed",
     "not-indexed": "Not indexed",
+    "reindex": "Reindex",
+    "click-to-index": "Click to index",
     "order-by": "Order By",
     "remove-completed-task-list-items": "Remove done",
     "remove-completed-task-list-items-confirm": "Are you sure you want to remove all completed to-dos? THIS ACTION IS IRREVERSIBLE",
