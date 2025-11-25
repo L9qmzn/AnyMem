@@ -151,6 +151,11 @@ func (s *APIV1Service) ListMemos(ctx context.Context, request *v1pb.ListMemosReq
 			return nil, status.Errorf(codes.InvalidArgument, "invalid filter: %v", err)
 		}
 		memoFind.Filters = append(memoFind.Filters, request.Filter)
+		// When filtering by specific UIDs (e.g., AI search results), include comments
+		// since users explicitly want to see those specific memos regardless of type.
+		if strings.Contains(request.Filter, "uid in") {
+			memoFind.ExcludeComments = false
+		}
 	}
 
 	currentUser, err := s.GetCurrentUser(ctx)
