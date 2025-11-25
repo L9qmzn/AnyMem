@@ -63,6 +63,100 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/ai/health:
+        get:
+            tags:
+                - MemoService
+            description: AiHealthCheck checks the AI service health.
+            operationId: MemoService_AiHealthCheck
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AiHealthCheckResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/ai/index/rebuild-status:
+        get:
+            tags:
+                - MemoService
+            description: GetRebuildStatus gets the rebuild index task status.
+            operationId: MemoService_GetRebuildStatus
+            parameters:
+                - name: creator
+                  in: query
+                  description: "The creator whose rebuild status to get.\r\n Format: users/{user}"
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RebuildTaskStatus'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/ai/index:rebuild:
+        post:
+            tags:
+                - MemoService
+            description: RebuildIndex rebuilds all memo indexes for a user.
+            operationId: MemoService_RebuildIndex
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RebuildIndexRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RebuildIndexResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/ai/search:
+        post:
+            tags:
+                - MemoService
+            description: AiSearch performs AI semantic search on memos.
+            operationId: MemoService_AiSearch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AiSearchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AiSearchResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/v1/attachments:
         get:
             tags:
@@ -839,6 +933,88 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Memo'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/memos/{memo}/index:
+        get:
+            tags:
+                - MemoService
+            description: GetMemoIndexInfo gets the index info of a memo.
+            operationId: MemoService_GetMemoIndexInfo
+            parameters:
+                - name: memo
+                  in: path
+                  description: The memo id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MemoIndexInfo'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - MemoService
+            description: IndexMemo indexes a memo for AI search.
+            operationId: MemoService_IndexMemo
+            parameters:
+                - name: memo
+                  in: path
+                  description: The memo id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IndexMemoRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IndexMemoResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - MemoService
+            description: DeleteMemoIndex deletes the index of a memo.
+            operationId: MemoService_DeleteMemoIndex
+            parameters:
+                - name: memo
+                  in: path
+                  description: The memo id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteMemoIndexResponse'
                 default:
                     description: Default error response
                     content:
@@ -2018,6 +2194,72 @@ components:
                     allOf:
                         - $ref: '#/components/schemas/ActivityMemoCommentPayload'
                     description: Memo comment activity payload.
+        AiHealthCheckResponse:
+            type: object
+            properties:
+                healthy:
+                    type: boolean
+                    description: Whether the AI service is healthy.
+            description: AiHealthCheckResponse is the response of AI health check.
+        AiSearchRequest:
+            required:
+                - query
+            type: object
+            properties:
+                query:
+                    type: string
+                    description: The search query.
+                topK:
+                    type: integer
+                    description: Maximum number of results to return.
+                    format: int32
+                searchMode:
+                    type: string
+                    description: 'Search mode: "text", "image", or "hybrid".'
+                minScore:
+                    type: number
+                    description: Minimum score threshold.
+                    format: float
+                creator:
+                    type: string
+                    description: "The creator to filter results by.\r\n Format: users/{user}"
+            description: AiSearchRequest is the request for AI semantic search.
+        AiSearchResponse:
+            type: object
+            properties:
+                results:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AiSearchResult'
+                    description: The search results.
+                query:
+                    type: string
+                    description: The original query.
+                searchMode:
+                    type: string
+                    description: The search mode used.
+                totalResults:
+                    type: integer
+                    description: Total number of results.
+                    format: int32
+            description: AiSearchResponse is the response of AI semantic search.
+        AiSearchResult:
+            type: object
+            properties:
+                memoUid:
+                    type: string
+                    description: The memo uid.
+                memoName:
+                    type: string
+                    description: The memo name.
+                score:
+                    type: number
+                    description: The relevance score.
+                    format: float
+                matchType:
+                    type: string
+                    description: The match type.
+            description: AiSearchResult represents a single search result.
         Attachment:
             required:
                 - filename
@@ -2106,6 +2348,13 @@ components:
                     type: string
                     description: "Last time the session was accessed.\r\n Used for sliding expiration calculation (last_accessed_time + 2 weeks)."
                     format: date-time
+        DeleteMemoIndexResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    description: Success status.
+            description: DeleteMemoIndexResponse is the response after deleting memo index.
         FieldMapping:
             type: object
             properties:
@@ -2194,6 +2443,28 @@ components:
             properties:
                 oauth2Config:
                     $ref: '#/components/schemas/OAuth2Config'
+        IndexMemoRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: "Required. The resource name of the memo.\r\n Format: memos/{memo}"
+            description: IndexMemoRequest is the request to index a memo.
+        IndexMemoResponse:
+            type: object
+            properties:
+                memoUid:
+                    type: string
+                    description: The memo uid that was indexed.
+                status:
+                    type: string
+                    description: The status of the indexing operation.
+                timestamp:
+                    type: string
+                    description: The timestamp of the operation.
+            description: IndexMemoResponse is the response after indexing a memo.
         InstanceProfile:
             type: object
             properties:
@@ -2618,6 +2889,24 @@ components:
                     allOf:
                         - $ref: '#/components/schemas/Location'
                     description: Optional. The location of the memo.
+        MemoIndexInfo:
+            type: object
+            properties:
+                memoUid:
+                    type: string
+                    description: The memo uid.
+                indexed:
+                    type: boolean
+                    description: Whether the memo is indexed.
+                textVectors:
+                    type: integer
+                    description: Number of text vectors.
+                    format: int32
+                imageVectors:
+                    type: integer
+                    description: Number of image vectors.
+                    format: int32
+            description: MemoIndexInfo contains the index information of a memo.
         MemoRelation:
             required:
                 - memo
@@ -2709,6 +2998,60 @@ components:
                     type: string
                     description: Output only. The creation timestamp.
                     format: date-time
+        RebuildIndexRequest:
+            required:
+                - creator
+            type: object
+            properties:
+                creator:
+                    type: string
+                    description: "The creator whose indexes to rebuild.\r\n Format: users/{user}"
+            description: RebuildIndexRequest is the request to rebuild all indexes.
+        RebuildIndexResponse:
+            type: object
+            properties:
+                creator:
+                    type: string
+                    description: The creator.
+                status:
+                    type: string
+                    description: The status.
+                totalMemos:
+                    type: integer
+                    description: Total number of memos to index.
+                    format: int32
+                timestamp:
+                    type: string
+                    description: The timestamp.
+            description: RebuildIndexResponse is the response after starting rebuild.
+        RebuildTaskStatus:
+            type: object
+            properties:
+                status:
+                    type: string
+                    description: 'The status: "pending", "running", "completed", "failed".'
+                startedAt:
+                    type: string
+                    description: The start time.
+                finishedAt:
+                    type: string
+                    description: The finish time.
+                total:
+                    type: integer
+                    description: Total memos to process.
+                    format: int32
+                completed:
+                    type: integer
+                    description: Number of completed memos.
+                    format: int32
+                failed:
+                    type: integer
+                    description: Number of failed memos.
+                    format: int32
+                error:
+                    type: string
+                    description: Error message if failed.
+            description: RebuildTaskStatus contains the rebuild task status.
         SetMemoAttachmentsRequest:
             required:
                 - name

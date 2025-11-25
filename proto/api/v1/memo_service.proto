@@ -111,6 +111,46 @@ service MemoService {
     };
     option (google.api.method_signature) = "name";
   }
+  // IndexMemo indexes a memo for AI search.
+  rpc IndexMemo(IndexMemoRequest) returns (IndexMemoResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/{name=memos/*}/index"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+  }
+  // DeleteMemoIndex deletes the index of a memo.
+  rpc DeleteMemoIndex(DeleteMemoIndexRequest) returns (DeleteMemoIndexResponse) {
+    option (google.api.http) = {delete: "/api/v1/{name=memos/*}/index"};
+    option (google.api.method_signature) = "name";
+  }
+  // GetMemoIndexInfo gets the index info of a memo.
+  rpc GetMemoIndexInfo(GetMemoIndexInfoRequest) returns (MemoIndexInfo) {
+    option (google.api.http) = {get: "/api/v1/{name=memos/*}/index"};
+    option (google.api.method_signature) = "name";
+  }
+  // AiSearch performs AI semantic search on memos.
+  rpc AiSearch(AiSearchRequest) returns (AiSearchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/ai/search"
+      body: "*"
+    };
+  }
+  // RebuildIndex rebuilds all memo indexes for a user.
+  rpc RebuildIndex(RebuildIndexRequest) returns (RebuildIndexResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/ai/index:rebuild"
+      body: "*"
+    };
+  }
+  // GetRebuildStatus gets the rebuild index task status.
+  rpc GetRebuildStatus(GetRebuildStatusRequest) returns (RebuildTaskStatus) {
+    option (google.api.http) = {get: "/api/v1/ai/index/rebuild-status"};
+  }
+  // AiHealthCheck checks the AI service health.
+  rpc AiHealthCheck(AiHealthCheckRequest) returns (AiHealthCheckResponse) {
+    option (google.api.http) = {get: "/api/v1/ai/health"};
+  }
 }
 
 enum Visibility {
@@ -530,4 +570,154 @@ message GenerateAiTagsRequest {
 message GenerateAiTagsResponse {
   // The generated AI tags.
   repeated string tags = 1;
+}
+
+// IndexMemoRequest is the request to index a memo.
+message IndexMemoRequest {
+  // Required. The resource name of the memo.
+  // Format: memos/{memo}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "memos.api.v1/Memo"}
+  ];
+}
+
+// IndexMemoResponse is the response after indexing a memo.
+message IndexMemoResponse {
+  // The memo uid that was indexed.
+  string memo_uid = 1;
+  // The status of the indexing operation.
+  string status = 2;
+  // The timestamp of the operation.
+  string timestamp = 3;
+}
+
+// DeleteMemoIndexRequest is the request to delete memo index.
+message DeleteMemoIndexRequest {
+  // Required. The resource name of the memo.
+  // Format: memos/{memo}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "memos.api.v1/Memo"}
+  ];
+}
+
+// DeleteMemoIndexResponse is the response after deleting memo index.
+message DeleteMemoIndexResponse {
+  // Success status.
+  bool success = 1;
+}
+
+// GetMemoIndexInfoRequest is the request to get memo index info.
+message GetMemoIndexInfoRequest {
+  // Required. The resource name of the memo.
+  // Format: memos/{memo}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {type: "memos.api.v1/Memo"}
+  ];
+}
+
+// MemoIndexInfo contains the index information of a memo.
+message MemoIndexInfo {
+  // The memo uid.
+  string memo_uid = 1;
+  // Whether the memo is indexed.
+  bool indexed = 2;
+  // Number of text vectors.
+  int32 text_vectors = 3;
+  // Number of image vectors.
+  int32 image_vectors = 4;
+}
+
+// AiSearchRequest is the request for AI semantic search.
+message AiSearchRequest {
+  // The search query.
+  string query = 1 [(google.api.field_behavior) = REQUIRED];
+  // Maximum number of results to return.
+  int32 top_k = 2;
+  // Search mode: "text", "image", or "hybrid".
+  string search_mode = 3;
+  // Minimum score threshold.
+  float min_score = 4;
+  // The creator to filter results by.
+  // Format: users/{user}
+  string creator = 5;
+}
+
+// AiSearchResponse is the response of AI semantic search.
+message AiSearchResponse {
+  // The search results.
+  repeated AiSearchResult results = 1;
+  // The original query.
+  string query = 2;
+  // The search mode used.
+  string search_mode = 3;
+  // Total number of results.
+  int32 total_results = 4;
+}
+
+// AiSearchResult represents a single search result.
+message AiSearchResult {
+  // The memo uid.
+  string memo_uid = 1;
+  // The memo name.
+  string memo_name = 2;
+  // The relevance score.
+  float score = 3;
+  // The match type.
+  string match_type = 4;
+}
+
+// RebuildIndexRequest is the request to rebuild all indexes.
+message RebuildIndexRequest {
+  // The creator whose indexes to rebuild.
+  // Format: users/{user}
+  string creator = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// RebuildIndexResponse is the response after starting rebuild.
+message RebuildIndexResponse {
+  // The creator.
+  string creator = 1;
+  // The status.
+  string status = 2;
+  // Total number of memos to index.
+  int32 total_memos = 3;
+  // The timestamp.
+  string timestamp = 4;
+}
+
+// GetRebuildStatusRequest is the request to get rebuild status.
+message GetRebuildStatusRequest {
+  // The creator whose rebuild status to get.
+  // Format: users/{user}
+  string creator = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// RebuildTaskStatus contains the rebuild task status.
+message RebuildTaskStatus {
+  // The status: "pending", "running", "completed", "failed".
+  string status = 1;
+  // The start time.
+  string started_at = 2;
+  // The finish time.
+  string finished_at = 3;
+  // Total memos to process.
+  int32 total = 4;
+  // Number of completed memos.
+  int32 completed = 5;
+  // Number of failed memos.
+  int32 failed = 6;
+  // Error message if failed.
+  string error = 7;
+}
+
+// AiHealthCheckRequest is the request to check AI service health.
+message AiHealthCheckRequest {}
+
+// AiHealthCheckResponse is the response of AI health check.
+message AiHealthCheckResponse {
+  // Whether the AI service is healthy.
+  bool healthy = 1;
 }

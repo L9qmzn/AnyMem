@@ -35,6 +35,13 @@ const (
 	MemoService_UpsertMemoReaction_FullMethodName  = "/memos.api.v1.MemoService/UpsertMemoReaction"
 	MemoService_DeleteMemoReaction_FullMethodName  = "/memos.api.v1.MemoService/DeleteMemoReaction"
 	MemoService_GenerateAiTags_FullMethodName      = "/memos.api.v1.MemoService/GenerateAiTags"
+	MemoService_IndexMemo_FullMethodName           = "/memos.api.v1.MemoService/IndexMemo"
+	MemoService_DeleteMemoIndex_FullMethodName     = "/memos.api.v1.MemoService/DeleteMemoIndex"
+	MemoService_GetMemoIndexInfo_FullMethodName    = "/memos.api.v1.MemoService/GetMemoIndexInfo"
+	MemoService_AiSearch_FullMethodName            = "/memos.api.v1.MemoService/AiSearch"
+	MemoService_RebuildIndex_FullMethodName        = "/memos.api.v1.MemoService/RebuildIndex"
+	MemoService_GetRebuildStatus_FullMethodName    = "/memos.api.v1.MemoService/GetRebuildStatus"
+	MemoService_AiHealthCheck_FullMethodName       = "/memos.api.v1.MemoService/AiHealthCheck"
 )
 
 // MemoServiceClient is the client API for MemoService service.
@@ -71,6 +78,20 @@ type MemoServiceClient interface {
 	DeleteMemoReaction(ctx context.Context, in *DeleteMemoReactionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GenerateAiTags generates AI tags for a memo.
 	GenerateAiTags(ctx context.Context, in *GenerateAiTagsRequest, opts ...grpc.CallOption) (*GenerateAiTagsResponse, error)
+	// IndexMemo indexes a memo for AI search.
+	IndexMemo(ctx context.Context, in *IndexMemoRequest, opts ...grpc.CallOption) (*IndexMemoResponse, error)
+	// DeleteMemoIndex deletes the index of a memo.
+	DeleteMemoIndex(ctx context.Context, in *DeleteMemoIndexRequest, opts ...grpc.CallOption) (*DeleteMemoIndexResponse, error)
+	// GetMemoIndexInfo gets the index info of a memo.
+	GetMemoIndexInfo(ctx context.Context, in *GetMemoIndexInfoRequest, opts ...grpc.CallOption) (*MemoIndexInfo, error)
+	// AiSearch performs AI semantic search on memos.
+	AiSearch(ctx context.Context, in *AiSearchRequest, opts ...grpc.CallOption) (*AiSearchResponse, error)
+	// RebuildIndex rebuilds all memo indexes for a user.
+	RebuildIndex(ctx context.Context, in *RebuildIndexRequest, opts ...grpc.CallOption) (*RebuildIndexResponse, error)
+	// GetRebuildStatus gets the rebuild index task status.
+	GetRebuildStatus(ctx context.Context, in *GetRebuildStatusRequest, opts ...grpc.CallOption) (*RebuildTaskStatus, error)
+	// AiHealthCheck checks the AI service health.
+	AiHealthCheck(ctx context.Context, in *AiHealthCheckRequest, opts ...grpc.CallOption) (*AiHealthCheckResponse, error)
 }
 
 type memoServiceClient struct {
@@ -231,6 +252,76 @@ func (c *memoServiceClient) GenerateAiTags(ctx context.Context, in *GenerateAiTa
 	return out, nil
 }
 
+func (c *memoServiceClient) IndexMemo(ctx context.Context, in *IndexMemoRequest, opts ...grpc.CallOption) (*IndexMemoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IndexMemoResponse)
+	err := c.cc.Invoke(ctx, MemoService_IndexMemo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoServiceClient) DeleteMemoIndex(ctx context.Context, in *DeleteMemoIndexRequest, opts ...grpc.CallOption) (*DeleteMemoIndexResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteMemoIndexResponse)
+	err := c.cc.Invoke(ctx, MemoService_DeleteMemoIndex_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoServiceClient) GetMemoIndexInfo(ctx context.Context, in *GetMemoIndexInfoRequest, opts ...grpc.CallOption) (*MemoIndexInfo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MemoIndexInfo)
+	err := c.cc.Invoke(ctx, MemoService_GetMemoIndexInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoServiceClient) AiSearch(ctx context.Context, in *AiSearchRequest, opts ...grpc.CallOption) (*AiSearchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AiSearchResponse)
+	err := c.cc.Invoke(ctx, MemoService_AiSearch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoServiceClient) RebuildIndex(ctx context.Context, in *RebuildIndexRequest, opts ...grpc.CallOption) (*RebuildIndexResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RebuildIndexResponse)
+	err := c.cc.Invoke(ctx, MemoService_RebuildIndex_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoServiceClient) GetRebuildStatus(ctx context.Context, in *GetRebuildStatusRequest, opts ...grpc.CallOption) (*RebuildTaskStatus, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RebuildTaskStatus)
+	err := c.cc.Invoke(ctx, MemoService_GetRebuildStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoServiceClient) AiHealthCheck(ctx context.Context, in *AiHealthCheckRequest, opts ...grpc.CallOption) (*AiHealthCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AiHealthCheckResponse)
+	err := c.cc.Invoke(ctx, MemoService_AiHealthCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MemoServiceServer is the server API for MemoService service.
 // All implementations must embed UnimplementedMemoServiceServer
 // for forward compatibility.
@@ -265,6 +356,20 @@ type MemoServiceServer interface {
 	DeleteMemoReaction(context.Context, *DeleteMemoReactionRequest) (*emptypb.Empty, error)
 	// GenerateAiTags generates AI tags for a memo.
 	GenerateAiTags(context.Context, *GenerateAiTagsRequest) (*GenerateAiTagsResponse, error)
+	// IndexMemo indexes a memo for AI search.
+	IndexMemo(context.Context, *IndexMemoRequest) (*IndexMemoResponse, error)
+	// DeleteMemoIndex deletes the index of a memo.
+	DeleteMemoIndex(context.Context, *DeleteMemoIndexRequest) (*DeleteMemoIndexResponse, error)
+	// GetMemoIndexInfo gets the index info of a memo.
+	GetMemoIndexInfo(context.Context, *GetMemoIndexInfoRequest) (*MemoIndexInfo, error)
+	// AiSearch performs AI semantic search on memos.
+	AiSearch(context.Context, *AiSearchRequest) (*AiSearchResponse, error)
+	// RebuildIndex rebuilds all memo indexes for a user.
+	RebuildIndex(context.Context, *RebuildIndexRequest) (*RebuildIndexResponse, error)
+	// GetRebuildStatus gets the rebuild index task status.
+	GetRebuildStatus(context.Context, *GetRebuildStatusRequest) (*RebuildTaskStatus, error)
+	// AiHealthCheck checks the AI service health.
+	AiHealthCheck(context.Context, *AiHealthCheckRequest) (*AiHealthCheckResponse, error)
 	mustEmbedUnimplementedMemoServiceServer()
 }
 
@@ -319,6 +424,27 @@ func (UnimplementedMemoServiceServer) DeleteMemoReaction(context.Context, *Delet
 }
 func (UnimplementedMemoServiceServer) GenerateAiTags(context.Context, *GenerateAiTagsRequest) (*GenerateAiTagsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateAiTags not implemented")
+}
+func (UnimplementedMemoServiceServer) IndexMemo(context.Context, *IndexMemoRequest) (*IndexMemoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IndexMemo not implemented")
+}
+func (UnimplementedMemoServiceServer) DeleteMemoIndex(context.Context, *DeleteMemoIndexRequest) (*DeleteMemoIndexResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMemoIndex not implemented")
+}
+func (UnimplementedMemoServiceServer) GetMemoIndexInfo(context.Context, *GetMemoIndexInfoRequest) (*MemoIndexInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMemoIndexInfo not implemented")
+}
+func (UnimplementedMemoServiceServer) AiSearch(context.Context, *AiSearchRequest) (*AiSearchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AiSearch not implemented")
+}
+func (UnimplementedMemoServiceServer) RebuildIndex(context.Context, *RebuildIndexRequest) (*RebuildIndexResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RebuildIndex not implemented")
+}
+func (UnimplementedMemoServiceServer) GetRebuildStatus(context.Context, *GetRebuildStatusRequest) (*RebuildTaskStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRebuildStatus not implemented")
+}
+func (UnimplementedMemoServiceServer) AiHealthCheck(context.Context, *AiHealthCheckRequest) (*AiHealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AiHealthCheck not implemented")
 }
 func (UnimplementedMemoServiceServer) mustEmbedUnimplementedMemoServiceServer() {}
 func (UnimplementedMemoServiceServer) testEmbeddedByValue()                     {}
@@ -611,6 +737,132 @@ func _MemoService_GenerateAiTags_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MemoService_IndexMemo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IndexMemoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).IndexMemo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_IndexMemo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).IndexMemo(ctx, req.(*IndexMemoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoService_DeleteMemoIndex_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteMemoIndexRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).DeleteMemoIndex(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_DeleteMemoIndex_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).DeleteMemoIndex(ctx, req.(*DeleteMemoIndexRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoService_GetMemoIndexInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMemoIndexInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).GetMemoIndexInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_GetMemoIndexInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).GetMemoIndexInfo(ctx, req.(*GetMemoIndexInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoService_AiSearch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AiSearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).AiSearch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_AiSearch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).AiSearch(ctx, req.(*AiSearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoService_RebuildIndex_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RebuildIndexRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).RebuildIndex(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_RebuildIndex_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).RebuildIndex(ctx, req.(*RebuildIndexRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoService_GetRebuildStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRebuildStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).GetRebuildStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_GetRebuildStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).GetRebuildStatus(ctx, req.(*GetRebuildStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoService_AiHealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AiHealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoServiceServer).AiHealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoService_AiHealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoServiceServer).AiHealthCheck(ctx, req.(*AiHealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MemoService_ServiceDesc is the grpc.ServiceDesc for MemoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -677,6 +929,34 @@ var MemoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateAiTags",
 			Handler:    _MemoService_GenerateAiTags_Handler,
+		},
+		{
+			MethodName: "IndexMemo",
+			Handler:    _MemoService_IndexMemo_Handler,
+		},
+		{
+			MethodName: "DeleteMemoIndex",
+			Handler:    _MemoService_DeleteMemoIndex_Handler,
+		},
+		{
+			MethodName: "GetMemoIndexInfo",
+			Handler:    _MemoService_GetMemoIndexInfo_Handler,
+		},
+		{
+			MethodName: "AiSearch",
+			Handler:    _MemoService_AiSearch_Handler,
+		},
+		{
+			MethodName: "RebuildIndex",
+			Handler:    _MemoService_RebuildIndex_Handler,
+		},
+		{
+			MethodName: "GetRebuildStatus",
+			Handler:    _MemoService_GetRebuildStatus_Handler,
+		},
+		{
+			MethodName: "AiHealthCheck",
+			Handler:    _MemoService_AiHealthCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

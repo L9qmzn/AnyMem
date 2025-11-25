@@ -1,5 +1,5 @@
-// AI Service API 客户端
-const AI_SERVICE_BASE_URL = import.meta.env.VITE_AI_SERVICE_URL || "http://localhost:8000";
+// AI Service API 客户端 - 通过后端代理调用AI服务
+import { memoServiceClient } from "@/grpcweb";
 
 export interface IndexMemoRequest {
   memo: any; // Memo 对象
@@ -63,127 +63,109 @@ export interface RebuildTaskStatus {
 }
 
 export class AIServiceClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string = AI_SERVICE_BASE_URL) {
-    this.baseUrl = baseUrl;
-  }
-
-  // 索引 Memo
+  // 索引 Memo - 通过后端代理
   async indexMemo(memo: any): Promise<IndexMemoResponse> {
-    const response = await fetch(`${this.baseUrl}/internal/index/memo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        memo: memo,
-        operation: "upsert",
-      }),
+    const response = await memoServiceClient.indexMemo({
+      name: memo.name,
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to index memo: ${response.statusText}`);
-    }
-
-    return response.json();
+    return {
+      memo_uid: response.memoUid,
+      status: response.status,
+      timestamp: response.timestamp,
+    };
   }
 
-  // 删除 Memo 索引
-  async deleteMemoIndex(memoUid: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/internal/index/memo/${encodeURIComponent(memoUid)}`, {
-      method: "DELETE",
+  // 删除 Memo 索引 - 通过后端代理
+  async deleteMemoIndex(memoName: string): Promise<void> {
+    await memoServiceClient.deleteMemoIndex({
+      name: memoName,
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete memo index: ${response.statusText}`);
-    }
   }
 
-  // 检查服务健康状态
+  // 检查服务健康状态 - 通过后端代理
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/health`);
-      return response.ok;
+      const response = await memoServiceClient.aiHealthCheck({});
+      return response.healthy;
     } catch (error) {
       console.error("AI Service health check failed:", error);
       return false;
     }
   }
 
-  // 语义搜索
+  // 语义搜索 - 通过后端代理
   async search(request: SearchRequest): Promise<SearchResponse> {
-    const response = await fetch(`${this.baseUrl}/internal/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: request.query,
-        top_k: request.top_k || 10,
-        search_mode: request.search_mode || "hybrid",
-        min_score: request.min_score || 0.5,
-        creator: request.creator, // 用户过滤
-      }),
+    const response = await memoServiceClient.aiSearch({
+      query: request.query,
+      topK: request.top_k || 10,
+      searchMode: request.search_mode || "hybrid",
+      minScore: request.min_score || 0.5,
+      creator: request.creator || "",
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to search: ${response.statusText}`);
-    }
-
-    return response.json();
+    return {
+      results: response.results.map((r) => ({
+        memo_uid: r.memoUid,
+        memo_name: r.memoName,
+        score: r.score,
+        match_type: r.matchType,
+      })),
+      query: response.query,
+      search_mode: response.searchMode,
+      total_results: response.totalResults,
+    };
   }
 
-  // 检查 Memo 索引状态
+  // 检查 Memo 索引状态 - 通过后端代理
   async getMemoIndexInfo(memoName: string): Promise<MemoIndexInfo | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/internal/index/memo/${encodeURIComponent(memoName)}`);
-      if (response.status === 404) {
-        return { memo_uid: memoName, indexed: false, text_vectors: 0, image_vectors: 0 };
-      }
-      if (!response.ok) {
-        throw new Error(`Failed to get memo index info: ${response.statusText}`);
-      }
-      const data = await response.json();
+      const response = await memoServiceClient.getMemoIndexInfo({
+        name: memoName,
+      });
       return {
-        memo_uid: memoName,
-        indexed: true,
-        text_vectors: data.text_count || 0,
-        image_vectors: data.image_count || 0,
+        memo_uid: response.memoUid,
+        indexed: response.indexed,
+        text_vectors: response.textVectors,
+        image_vectors: response.imageVectors,
       };
     } catch {
       return null;
     }
   }
 
-  // 重建用户所有索引
+  // 重建用户所有索引 - 通过后端代理
   async rebuildIndex(creator: string): Promise<RebuildIndexResponse> {
-    const response = await fetch(`${this.baseUrl}/internal/index/rebuild`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ creator }),
+    const response = await memoServiceClient.rebuildIndex({
+      creator,
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to start rebuild: ${response.statusText}`);
-    }
-
-    return response.json();
+    return {
+      creator: response.creator,
+      status: response.status,
+      total_memos: response.totalMemos,
+      timestamp: response.timestamp,
+    };
   }
 
-  // 获取重建任务状态
+  // 获取重建任务状态 - 通过后端代理
   async getRebuildStatus(creator: string): Promise<RebuildTaskStatus | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/internal/index/rebuild/${encodeURIComponent(creator)}`);
-      if (response.status === 404) {
+      const response = await memoServiceClient.getRebuildStatus({
+        creator,
+      });
+      if (response.status === "not_found") {
         return null;
       }
-      if (!response.ok) {
-        throw new Error(`Failed to get rebuild status: ${response.statusText}`);
-      }
-      return response.json();
+      return {
+        status: response.status,
+        started_at: response.startedAt,
+        finished_at: response.finishedAt,
+        total: response.total,
+        completed: response.completed,
+        failed: response.failed,
+        error: response.error,
+      };
     } catch {
       return null;
     }
@@ -215,14 +197,14 @@ export async function indexMemoIfEnabled(memo: any, userSetting: any): Promise<v
   }
 }
 
-export async function deleteMemoIndexIfEnabled(memoUid: string, userSetting: any): Promise<void> {
+export async function deleteMemoIndexIfEnabled(memoName: string, userSetting: any): Promise<void> {
   if (!userSetting?.autoGenerateIndex) {
     return;
   }
 
   try {
-    await aiServiceClient.deleteMemoIndex(memoUid);
-    console.log(`Memo ${memoUid} index deleted successfully`);
+    await aiServiceClient.deleteMemoIndex(memoName);
+    console.log(`Memo ${memoName} index deleted successfully`);
   } catch (error) {
     console.error("Failed to delete memo index:", error);
     // 不抛出错误，避免影响主流程

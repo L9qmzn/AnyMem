@@ -774,6 +774,239 @@ func local_request_MemoService_GenerateAiTags_0(ctx context.Context, marshaler r
 	return msg, metadata, err
 }
 
+func request_MemoService_IndexMemo_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq IndexMemoRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+	msg, err := client.IndexMemo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_IndexMemo_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq IndexMemoRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+	msg, err := server.IndexMemo(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_MemoService_DeleteMemoIndex_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteMemoIndexRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+	msg, err := client.DeleteMemoIndex(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_DeleteMemoIndex_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteMemoIndexRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+	msg, err := server.DeleteMemoIndex(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_MemoService_GetMemoIndexInfo_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetMemoIndexInfoRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+	msg, err := client.GetMemoIndexInfo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_GetMemoIndexInfo_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetMemoIndexInfoRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+	}
+	protoReq.Name, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+	}
+	msg, err := server.GetMemoIndexInfo(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_MemoService_AiSearch_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AiSearchRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.AiSearch(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_AiSearch_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AiSearchRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.AiSearch(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_MemoService_RebuildIndex_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq RebuildIndexRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.RebuildIndex(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_RebuildIndex_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq RebuildIndexRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.RebuildIndex(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+var filter_MemoService_GetRebuildStatus_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_MemoService_GetRebuildStatus_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetRebuildStatusRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MemoService_GetRebuildStatus_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetRebuildStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_GetRebuildStatus_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetRebuildStatusRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MemoService_GetRebuildStatus_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetRebuildStatus(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_MemoService_AiHealthCheck_0(ctx context.Context, marshaler runtime.Marshaler, client MemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AiHealthCheckRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.AiHealthCheck(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_MemoService_AiHealthCheck_0(ctx context.Context, marshaler runtime.Marshaler, server MemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq AiHealthCheckRequest
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.AiHealthCheck(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterMemoServiceHandlerServer registers the http handlers for service MemoService to "mux".
 // UnaryRPC     :call MemoServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -1080,6 +1313,146 @@ func RegisterMemoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		}
 		forward_MemoService_GenerateAiTags_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPost, pattern_MemoService_IndexMemo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/IndexMemo", runtime.WithHTTPPathPattern("/api/v1/{name=memos/*}/index"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_IndexMemo_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_IndexMemo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_MemoService_DeleteMemoIndex_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/DeleteMemoIndex", runtime.WithHTTPPathPattern("/api/v1/{name=memos/*}/index"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_DeleteMemoIndex_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_DeleteMemoIndex_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_MemoService_GetMemoIndexInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/GetMemoIndexInfo", runtime.WithHTTPPathPattern("/api/v1/{name=memos/*}/index"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_GetMemoIndexInfo_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_GetMemoIndexInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_MemoService_AiSearch_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/AiSearch", runtime.WithHTTPPathPattern("/api/v1/ai/search"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_AiSearch_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_AiSearch_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_MemoService_RebuildIndex_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/RebuildIndex", runtime.WithHTTPPathPattern("/api/v1/ai/index:rebuild"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_RebuildIndex_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_RebuildIndex_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_MemoService_GetRebuildStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/GetRebuildStatus", runtime.WithHTTPPathPattern("/api/v1/ai/index/rebuild-status"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_GetRebuildStatus_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_GetRebuildStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_MemoService_AiHealthCheck_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/memos.api.v1.MemoService/AiHealthCheck", runtime.WithHTTPPathPattern("/api/v1/ai/health"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_MemoService_AiHealthCheck_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_AiHealthCheck_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 
 	return nil
 }
@@ -1375,6 +1748,125 @@ func RegisterMemoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		}
 		forward_MemoService_GenerateAiTags_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPost, pattern_MemoService_IndexMemo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/IndexMemo", runtime.WithHTTPPathPattern("/api/v1/{name=memos/*}/index"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_IndexMemo_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_IndexMemo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_MemoService_DeleteMemoIndex_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/DeleteMemoIndex", runtime.WithHTTPPathPattern("/api/v1/{name=memos/*}/index"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_DeleteMemoIndex_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_DeleteMemoIndex_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_MemoService_GetMemoIndexInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/GetMemoIndexInfo", runtime.WithHTTPPathPattern("/api/v1/{name=memos/*}/index"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_GetMemoIndexInfo_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_GetMemoIndexInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_MemoService_AiSearch_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/AiSearch", runtime.WithHTTPPathPattern("/api/v1/ai/search"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_AiSearch_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_AiSearch_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_MemoService_RebuildIndex_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/RebuildIndex", runtime.WithHTTPPathPattern("/api/v1/ai/index:rebuild"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_RebuildIndex_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_RebuildIndex_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_MemoService_GetRebuildStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/GetRebuildStatus", runtime.WithHTTPPathPattern("/api/v1/ai/index/rebuild-status"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_GetRebuildStatus_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_GetRebuildStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_MemoService_AiHealthCheck_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/memos.api.v1.MemoService/AiHealthCheck", runtime.WithHTTPPathPattern("/api/v1/ai/health"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_MemoService_AiHealthCheck_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_MemoService_AiHealthCheck_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
@@ -1394,6 +1886,13 @@ var (
 	pattern_MemoService_UpsertMemoReaction_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 2, 5, 3, 2, 4}, []string{"api", "v1", "memos", "name", "reactions"}, ""))
 	pattern_MemoService_DeleteMemoReaction_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 2, 5, 3}, []string{"api", "v1", "reactions", "name"}, ""))
 	pattern_MemoService_GenerateAiTags_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 2, 5, 3, 2, 4}, []string{"api", "v1", "memos", "name", "ai-tags"}, "generate"))
+	pattern_MemoService_IndexMemo_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 2, 5, 3, 2, 4}, []string{"api", "v1", "memos", "name", "index"}, ""))
+	pattern_MemoService_DeleteMemoIndex_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 2, 5, 3, 2, 4}, []string{"api", "v1", "memos", "name", "index"}, ""))
+	pattern_MemoService_GetMemoIndexInfo_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 2, 5, 3, 2, 4}, []string{"api", "v1", "memos", "name", "index"}, ""))
+	pattern_MemoService_AiSearch_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "ai", "search"}, ""))
+	pattern_MemoService_RebuildIndex_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "ai", "index"}, "rebuild"))
+	pattern_MemoService_GetRebuildStatus_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "ai", "index", "rebuild-status"}, ""))
+	pattern_MemoService_AiHealthCheck_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "ai", "health"}, ""))
 )
 
 var (
@@ -1412,4 +1911,11 @@ var (
 	forward_MemoService_UpsertMemoReaction_0  = runtime.ForwardResponseMessage
 	forward_MemoService_DeleteMemoReaction_0  = runtime.ForwardResponseMessage
 	forward_MemoService_GenerateAiTags_0      = runtime.ForwardResponseMessage
+	forward_MemoService_IndexMemo_0           = runtime.ForwardResponseMessage
+	forward_MemoService_DeleteMemoIndex_0     = runtime.ForwardResponseMessage
+	forward_MemoService_GetMemoIndexInfo_0    = runtime.ForwardResponseMessage
+	forward_MemoService_AiSearch_0            = runtime.ForwardResponseMessage
+	forward_MemoService_RebuildIndex_0        = runtime.ForwardResponseMessage
+	forward_MemoService_GetRebuildStatus_0    = runtime.ForwardResponseMessage
+	forward_MemoService_AiHealthCheck_0       = runtime.ForwardResponseMessage
 )

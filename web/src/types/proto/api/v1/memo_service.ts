@@ -453,6 +453,160 @@ export interface GenerateAiTagsResponse {
   tags: string[];
 }
 
+/** IndexMemoRequest is the request to index a memo. */
+export interface IndexMemoRequest {
+  /**
+   * Required. The resource name of the memo.
+   * Format: memos/{memo}
+   */
+  name: string;
+}
+
+/** IndexMemoResponse is the response after indexing a memo. */
+export interface IndexMemoResponse {
+  /** The memo uid that was indexed. */
+  memoUid: string;
+  /** The status of the indexing operation. */
+  status: string;
+  /** The timestamp of the operation. */
+  timestamp: string;
+}
+
+/** DeleteMemoIndexRequest is the request to delete memo index. */
+export interface DeleteMemoIndexRequest {
+  /**
+   * Required. The resource name of the memo.
+   * Format: memos/{memo}
+   */
+  name: string;
+}
+
+/** DeleteMemoIndexResponse is the response after deleting memo index. */
+export interface DeleteMemoIndexResponse {
+  /** Success status. */
+  success: boolean;
+}
+
+/** GetMemoIndexInfoRequest is the request to get memo index info. */
+export interface GetMemoIndexInfoRequest {
+  /**
+   * Required. The resource name of the memo.
+   * Format: memos/{memo}
+   */
+  name: string;
+}
+
+/** MemoIndexInfo contains the index information of a memo. */
+export interface MemoIndexInfo {
+  /** The memo uid. */
+  memoUid: string;
+  /** Whether the memo is indexed. */
+  indexed: boolean;
+  /** Number of text vectors. */
+  textVectors: number;
+  /** Number of image vectors. */
+  imageVectors: number;
+}
+
+/** AiSearchRequest is the request for AI semantic search. */
+export interface AiSearchRequest {
+  /** The search query. */
+  query: string;
+  /** Maximum number of results to return. */
+  topK: number;
+  /** Search mode: "text", "image", or "hybrid". */
+  searchMode: string;
+  /** Minimum score threshold. */
+  minScore: number;
+  /**
+   * The creator to filter results by.
+   * Format: users/{user}
+   */
+  creator: string;
+}
+
+/** AiSearchResponse is the response of AI semantic search. */
+export interface AiSearchResponse {
+  /** The search results. */
+  results: AiSearchResult[];
+  /** The original query. */
+  query: string;
+  /** The search mode used. */
+  searchMode: string;
+  /** Total number of results. */
+  totalResults: number;
+}
+
+/** AiSearchResult represents a single search result. */
+export interface AiSearchResult {
+  /** The memo uid. */
+  memoUid: string;
+  /** The memo name. */
+  memoName: string;
+  /** The relevance score. */
+  score: number;
+  /** The match type. */
+  matchType: string;
+}
+
+/** RebuildIndexRequest is the request to rebuild all indexes. */
+export interface RebuildIndexRequest {
+  /**
+   * The creator whose indexes to rebuild.
+   * Format: users/{user}
+   */
+  creator: string;
+}
+
+/** RebuildIndexResponse is the response after starting rebuild. */
+export interface RebuildIndexResponse {
+  /** The creator. */
+  creator: string;
+  /** The status. */
+  status: string;
+  /** Total number of memos to index. */
+  totalMemos: number;
+  /** The timestamp. */
+  timestamp: string;
+}
+
+/** GetRebuildStatusRequest is the request to get rebuild status. */
+export interface GetRebuildStatusRequest {
+  /**
+   * The creator whose rebuild status to get.
+   * Format: users/{user}
+   */
+  creator: string;
+}
+
+/** RebuildTaskStatus contains the rebuild task status. */
+export interface RebuildTaskStatus {
+  /** The status: "pending", "running", "completed", "failed". */
+  status: string;
+  /** The start time. */
+  startedAt: string;
+  /** The finish time. */
+  finishedAt: string;
+  /** Total memos to process. */
+  total: number;
+  /** Number of completed memos. */
+  completed: number;
+  /** Number of failed memos. */
+  failed: number;
+  /** Error message if failed. */
+  error: string;
+}
+
+/** AiHealthCheckRequest is the request to check AI service health. */
+export interface AiHealthCheckRequest {
+}
+
+/** AiHealthCheckResponse is the response of AI health check. */
+export interface AiHealthCheckResponse {
+  /** Whether the AI service is healthy. */
+  healthy: boolean;
+}
+
 function createBaseReaction(): Reaction {
   return { name: "", creator: "", contentId: "", reactionType: "", createTime: undefined };
 }
@@ -2422,6 +2576,972 @@ export const GenerateAiTagsResponse: MessageFns<GenerateAiTagsResponse> = {
   },
 };
 
+function createBaseIndexMemoRequest(): IndexMemoRequest {
+  return { name: "" };
+}
+
+export const IndexMemoRequest: MessageFns<IndexMemoRequest> = {
+  encode(message: IndexMemoRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): IndexMemoRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIndexMemoRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<IndexMemoRequest>): IndexMemoRequest {
+    return IndexMemoRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<IndexMemoRequest>): IndexMemoRequest {
+    const message = createBaseIndexMemoRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
+function createBaseIndexMemoResponse(): IndexMemoResponse {
+  return { memoUid: "", status: "", timestamp: "" };
+}
+
+export const IndexMemoResponse: MessageFns<IndexMemoResponse> = {
+  encode(message: IndexMemoResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.memoUid !== "") {
+      writer.uint32(10).string(message.memoUid);
+    }
+    if (message.status !== "") {
+      writer.uint32(18).string(message.status);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): IndexMemoResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIndexMemoResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.memoUid = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<IndexMemoResponse>): IndexMemoResponse {
+    return IndexMemoResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<IndexMemoResponse>): IndexMemoResponse {
+    const message = createBaseIndexMemoResponse();
+    message.memoUid = object.memoUid ?? "";
+    message.status = object.status ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteMemoIndexRequest(): DeleteMemoIndexRequest {
+  return { name: "" };
+}
+
+export const DeleteMemoIndexRequest: MessageFns<DeleteMemoIndexRequest> = {
+  encode(message: DeleteMemoIndexRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteMemoIndexRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteMemoIndexRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<DeleteMemoIndexRequest>): DeleteMemoIndexRequest {
+    return DeleteMemoIndexRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeleteMemoIndexRequest>): DeleteMemoIndexRequest {
+    const message = createBaseDeleteMemoIndexRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteMemoIndexResponse(): DeleteMemoIndexResponse {
+  return { success: false };
+}
+
+export const DeleteMemoIndexResponse: MessageFns<DeleteMemoIndexResponse> = {
+  encode(message: DeleteMemoIndexResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteMemoIndexResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteMemoIndexResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<DeleteMemoIndexResponse>): DeleteMemoIndexResponse {
+    return DeleteMemoIndexResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeleteMemoIndexResponse>): DeleteMemoIndexResponse {
+    const message = createBaseDeleteMemoIndexResponse();
+    message.success = object.success ?? false;
+    return message;
+  },
+};
+
+function createBaseGetMemoIndexInfoRequest(): GetMemoIndexInfoRequest {
+  return { name: "" };
+}
+
+export const GetMemoIndexInfoRequest: MessageFns<GetMemoIndexInfoRequest> = {
+  encode(message: GetMemoIndexInfoRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetMemoIndexInfoRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetMemoIndexInfoRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<GetMemoIndexInfoRequest>): GetMemoIndexInfoRequest {
+    return GetMemoIndexInfoRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetMemoIndexInfoRequest>): GetMemoIndexInfoRequest {
+    const message = createBaseGetMemoIndexInfoRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
+function createBaseMemoIndexInfo(): MemoIndexInfo {
+  return { memoUid: "", indexed: false, textVectors: 0, imageVectors: 0 };
+}
+
+export const MemoIndexInfo: MessageFns<MemoIndexInfo> = {
+  encode(message: MemoIndexInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.memoUid !== "") {
+      writer.uint32(10).string(message.memoUid);
+    }
+    if (message.indexed !== false) {
+      writer.uint32(16).bool(message.indexed);
+    }
+    if (message.textVectors !== 0) {
+      writer.uint32(24).int32(message.textVectors);
+    }
+    if (message.imageVectors !== 0) {
+      writer.uint32(32).int32(message.imageVectors);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MemoIndexInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMemoIndexInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.memoUid = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.indexed = reader.bool();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.textVectors = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.imageVectors = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<MemoIndexInfo>): MemoIndexInfo {
+    return MemoIndexInfo.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MemoIndexInfo>): MemoIndexInfo {
+    const message = createBaseMemoIndexInfo();
+    message.memoUid = object.memoUid ?? "";
+    message.indexed = object.indexed ?? false;
+    message.textVectors = object.textVectors ?? 0;
+    message.imageVectors = object.imageVectors ?? 0;
+    return message;
+  },
+};
+
+function createBaseAiSearchRequest(): AiSearchRequest {
+  return { query: "", topK: 0, searchMode: "", minScore: 0, creator: "" };
+}
+
+export const AiSearchRequest: MessageFns<AiSearchRequest> = {
+  encode(message: AiSearchRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.query !== "") {
+      writer.uint32(10).string(message.query);
+    }
+    if (message.topK !== 0) {
+      writer.uint32(16).int32(message.topK);
+    }
+    if (message.searchMode !== "") {
+      writer.uint32(26).string(message.searchMode);
+    }
+    if (message.minScore !== 0) {
+      writer.uint32(37).float(message.minScore);
+    }
+    if (message.creator !== "") {
+      writer.uint32(42).string(message.creator);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AiSearchRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAiSearchRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.query = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.topK = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.searchMode = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 37) {
+            break;
+          }
+
+          message.minScore = reader.float();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.creator = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<AiSearchRequest>): AiSearchRequest {
+    return AiSearchRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AiSearchRequest>): AiSearchRequest {
+    const message = createBaseAiSearchRequest();
+    message.query = object.query ?? "";
+    message.topK = object.topK ?? 0;
+    message.searchMode = object.searchMode ?? "";
+    message.minScore = object.minScore ?? 0;
+    message.creator = object.creator ?? "";
+    return message;
+  },
+};
+
+function createBaseAiSearchResponse(): AiSearchResponse {
+  return { results: [], query: "", searchMode: "", totalResults: 0 };
+}
+
+export const AiSearchResponse: MessageFns<AiSearchResponse> = {
+  encode(message: AiSearchResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.results) {
+      AiSearchResult.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.query !== "") {
+      writer.uint32(18).string(message.query);
+    }
+    if (message.searchMode !== "") {
+      writer.uint32(26).string(message.searchMode);
+    }
+    if (message.totalResults !== 0) {
+      writer.uint32(32).int32(message.totalResults);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AiSearchResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAiSearchResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.results.push(AiSearchResult.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.query = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.searchMode = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.totalResults = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<AiSearchResponse>): AiSearchResponse {
+    return AiSearchResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AiSearchResponse>): AiSearchResponse {
+    const message = createBaseAiSearchResponse();
+    message.results = object.results?.map((e) => AiSearchResult.fromPartial(e)) || [];
+    message.query = object.query ?? "";
+    message.searchMode = object.searchMode ?? "";
+    message.totalResults = object.totalResults ?? 0;
+    return message;
+  },
+};
+
+function createBaseAiSearchResult(): AiSearchResult {
+  return { memoUid: "", memoName: "", score: 0, matchType: "" };
+}
+
+export const AiSearchResult: MessageFns<AiSearchResult> = {
+  encode(message: AiSearchResult, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.memoUid !== "") {
+      writer.uint32(10).string(message.memoUid);
+    }
+    if (message.memoName !== "") {
+      writer.uint32(18).string(message.memoName);
+    }
+    if (message.score !== 0) {
+      writer.uint32(29).float(message.score);
+    }
+    if (message.matchType !== "") {
+      writer.uint32(34).string(message.matchType);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AiSearchResult {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAiSearchResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.memoUid = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.memoName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 29) {
+            break;
+          }
+
+          message.score = reader.float();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.matchType = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<AiSearchResult>): AiSearchResult {
+    return AiSearchResult.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AiSearchResult>): AiSearchResult {
+    const message = createBaseAiSearchResult();
+    message.memoUid = object.memoUid ?? "";
+    message.memoName = object.memoName ?? "";
+    message.score = object.score ?? 0;
+    message.matchType = object.matchType ?? "";
+    return message;
+  },
+};
+
+function createBaseRebuildIndexRequest(): RebuildIndexRequest {
+  return { creator: "" };
+}
+
+export const RebuildIndexRequest: MessageFns<RebuildIndexRequest> = {
+  encode(message: RebuildIndexRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RebuildIndexRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRebuildIndexRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.creator = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<RebuildIndexRequest>): RebuildIndexRequest {
+    return RebuildIndexRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RebuildIndexRequest>): RebuildIndexRequest {
+    const message = createBaseRebuildIndexRequest();
+    message.creator = object.creator ?? "";
+    return message;
+  },
+};
+
+function createBaseRebuildIndexResponse(): RebuildIndexResponse {
+  return { creator: "", status: "", totalMemos: 0, timestamp: "" };
+}
+
+export const RebuildIndexResponse: MessageFns<RebuildIndexResponse> = {
+  encode(message: RebuildIndexResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.status !== "") {
+      writer.uint32(18).string(message.status);
+    }
+    if (message.totalMemos !== 0) {
+      writer.uint32(24).int32(message.totalMemos);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RebuildIndexResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRebuildIndexResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.creator = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.totalMemos = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<RebuildIndexResponse>): RebuildIndexResponse {
+    return RebuildIndexResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RebuildIndexResponse>): RebuildIndexResponse {
+    const message = createBaseRebuildIndexResponse();
+    message.creator = object.creator ?? "";
+    message.status = object.status ?? "";
+    message.totalMemos = object.totalMemos ?? 0;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetRebuildStatusRequest(): GetRebuildStatusRequest {
+  return { creator: "" };
+}
+
+export const GetRebuildStatusRequest: MessageFns<GetRebuildStatusRequest> = {
+  encode(message: GetRebuildStatusRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetRebuildStatusRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetRebuildStatusRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.creator = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<GetRebuildStatusRequest>): GetRebuildStatusRequest {
+    return GetRebuildStatusRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetRebuildStatusRequest>): GetRebuildStatusRequest {
+    const message = createBaseGetRebuildStatusRequest();
+    message.creator = object.creator ?? "";
+    return message;
+  },
+};
+
+function createBaseRebuildTaskStatus(): RebuildTaskStatus {
+  return { status: "", startedAt: "", finishedAt: "", total: 0, completed: 0, failed: 0, error: "" };
+}
+
+export const RebuildTaskStatus: MessageFns<RebuildTaskStatus> = {
+  encode(message: RebuildTaskStatus, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.status !== "") {
+      writer.uint32(10).string(message.status);
+    }
+    if (message.startedAt !== "") {
+      writer.uint32(18).string(message.startedAt);
+    }
+    if (message.finishedAt !== "") {
+      writer.uint32(26).string(message.finishedAt);
+    }
+    if (message.total !== 0) {
+      writer.uint32(32).int32(message.total);
+    }
+    if (message.completed !== 0) {
+      writer.uint32(40).int32(message.completed);
+    }
+    if (message.failed !== 0) {
+      writer.uint32(48).int32(message.failed);
+    }
+    if (message.error !== "") {
+      writer.uint32(58).string(message.error);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RebuildTaskStatus {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRebuildTaskStatus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.startedAt = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.finishedAt = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.total = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.completed = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.failed = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<RebuildTaskStatus>): RebuildTaskStatus {
+    return RebuildTaskStatus.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RebuildTaskStatus>): RebuildTaskStatus {
+    const message = createBaseRebuildTaskStatus();
+    message.status = object.status ?? "";
+    message.startedAt = object.startedAt ?? "";
+    message.finishedAt = object.finishedAt ?? "";
+    message.total = object.total ?? 0;
+    message.completed = object.completed ?? 0;
+    message.failed = object.failed ?? 0;
+    message.error = object.error ?? "";
+    return message;
+  },
+};
+
+function createBaseAiHealthCheckRequest(): AiHealthCheckRequest {
+  return {};
+}
+
+export const AiHealthCheckRequest: MessageFns<AiHealthCheckRequest> = {
+  encode(_: AiHealthCheckRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AiHealthCheckRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAiHealthCheckRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<AiHealthCheckRequest>): AiHealthCheckRequest {
+    return AiHealthCheckRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<AiHealthCheckRequest>): AiHealthCheckRequest {
+    const message = createBaseAiHealthCheckRequest();
+    return message;
+  },
+};
+
+function createBaseAiHealthCheckResponse(): AiHealthCheckResponse {
+  return { healthy: false };
+}
+
+export const AiHealthCheckResponse: MessageFns<AiHealthCheckResponse> = {
+  encode(message: AiHealthCheckResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.healthy !== false) {
+      writer.uint32(8).bool(message.healthy);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AiHealthCheckResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAiHealthCheckResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.healthy = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<AiHealthCheckResponse>): AiHealthCheckResponse {
+    return AiHealthCheckResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AiHealthCheckResponse>): AiHealthCheckResponse {
+    const message = createBaseAiHealthCheckResponse();
+    message.healthy = object.healthy ?? false;
+    return message;
+  },
+};
+
 export type MemoServiceDefinition = typeof MemoServiceDefinition;
 export const MemoServiceDefinition = {
   name: "MemoService",
@@ -3157,6 +4277,303 @@ export const MemoServiceDefinition = {
               116,
               101,
             ]),
+          ],
+        },
+      },
+    },
+    /** IndexMemo indexes a memo for AI search. */
+    indexMemo: {
+      name: "IndexMemo",
+      requestType: IndexMemoRequest,
+      requestStream: false,
+      responseType: IndexMemoResponse,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          8410: [new Uint8Array([4, 110, 97, 109, 101])],
+          578365826: [
+            new Uint8Array([
+              33,
+              58,
+              1,
+              42,
+              34,
+              28,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              123,
+              110,
+              97,
+              109,
+              101,
+              61,
+              109,
+              101,
+              109,
+              111,
+              115,
+              47,
+              42,
+              125,
+              47,
+              105,
+              110,
+              100,
+              101,
+              120,
+            ]),
+          ],
+        },
+      },
+    },
+    /** DeleteMemoIndex deletes the index of a memo. */
+    deleteMemoIndex: {
+      name: "DeleteMemoIndex",
+      requestType: DeleteMemoIndexRequest,
+      requestStream: false,
+      responseType: DeleteMemoIndexResponse,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          8410: [new Uint8Array([4, 110, 97, 109, 101])],
+          578365826: [
+            new Uint8Array([
+              30,
+              42,
+              28,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              123,
+              110,
+              97,
+              109,
+              101,
+              61,
+              109,
+              101,
+              109,
+              111,
+              115,
+              47,
+              42,
+              125,
+              47,
+              105,
+              110,
+              100,
+              101,
+              120,
+            ]),
+          ],
+        },
+      },
+    },
+    /** GetMemoIndexInfo gets the index info of a memo. */
+    getMemoIndexInfo: {
+      name: "GetMemoIndexInfo",
+      requestType: GetMemoIndexInfoRequest,
+      requestStream: false,
+      responseType: MemoIndexInfo,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          8410: [new Uint8Array([4, 110, 97, 109, 101])],
+          578365826: [
+            new Uint8Array([
+              30,
+              18,
+              28,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              123,
+              110,
+              97,
+              109,
+              101,
+              61,
+              109,
+              101,
+              109,
+              111,
+              115,
+              47,
+              42,
+              125,
+              47,
+              105,
+              110,
+              100,
+              101,
+              120,
+            ]),
+          ],
+        },
+      },
+    },
+    /** AiSearch performs AI semantic search on memos. */
+    aiSearch: {
+      name: "AiSearch",
+      requestType: AiSearchRequest,
+      requestStream: false,
+      responseType: AiSearchResponse,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              22,
+              58,
+              1,
+              42,
+              34,
+              17,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              97,
+              105,
+              47,
+              115,
+              101,
+              97,
+              114,
+              99,
+              104,
+            ]),
+          ],
+        },
+      },
+    },
+    /** RebuildIndex rebuilds all memo indexes for a user. */
+    rebuildIndex: {
+      name: "RebuildIndex",
+      requestType: RebuildIndexRequest,
+      requestStream: false,
+      responseType: RebuildIndexResponse,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              29,
+              58,
+              1,
+              42,
+              34,
+              24,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              97,
+              105,
+              47,
+              105,
+              110,
+              100,
+              101,
+              120,
+              58,
+              114,
+              101,
+              98,
+              117,
+              105,
+              108,
+              100,
+            ]),
+          ],
+        },
+      },
+    },
+    /** GetRebuildStatus gets the rebuild index task status. */
+    getRebuildStatus: {
+      name: "GetRebuildStatus",
+      requestType: GetRebuildStatusRequest,
+      requestStream: false,
+      responseType: RebuildTaskStatus,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              33,
+              18,
+              31,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              97,
+              105,
+              47,
+              105,
+              110,
+              100,
+              101,
+              120,
+              47,
+              114,
+              101,
+              98,
+              117,
+              105,
+              108,
+              100,
+              45,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+            ]),
+          ],
+        },
+      },
+    },
+    /** AiHealthCheck checks the AI service health. */
+    aiHealthCheck: {
+      name: "AiHealthCheck",
+      requestType: AiHealthCheckRequest,
+      requestStream: false,
+      responseType: AiHealthCheckResponse,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([19, 18, 17, 47, 97, 112, 105, 47, 118, 49, 47, 97, 105, 47, 104, 101, 97, 108, 116, 104]),
           ],
         },
       },
