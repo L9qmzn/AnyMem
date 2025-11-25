@@ -47,6 +47,8 @@ message GeneralUserSetting {
   bool auto_generate_index = 5;
   // Whether to enable AI-powered semantic search instead of traditional keyword search.
   bool enable_ai_search = 6;
+  // Whether to enable developer mode for viewing detailed AI index info.
+  bool developer_mode = 7;
 }
 
 message SessionsUserSetting {

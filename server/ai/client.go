@@ -189,21 +189,45 @@ func (c *Client) DeleteMemoIndex(ctx context.Context, memoUID string) error {
 	return nil
 }
 
+// TextChunk represents a text segment that was indexed.
+type TextChunk struct {
+	DocID       string `json:"doc_id"`
+	Content     string `json:"content"`
+	ContentType string `json:"content_type"`
+}
+
+// ImageInfo represents indexed image information.
+type ImageInfo struct {
+	DocID    string `json:"doc_id"`
+	Filename string `json:"filename"`
+	Caption  string `json:"caption"`
+}
+
+// MemoIndexDetail contains detailed index information.
+type MemoIndexDetail struct {
+	TextChunks []TextChunk `json:"text_chunks"`
+	Images     []ImageInfo `json:"images"`
+}
+
 // MemoIndexInfo is the index info of a memo.
 type MemoIndexInfo struct {
-	MemoUID      string `json:"memo_uid"`
-	Indexed      bool   `json:"indexed"`
-	TextCount    int    `json:"text_count"`
-	ImageCount   int    `json:"image_count"`
-	TextVectors  int    `json:"text_vectors"`
-	ImageVectors int    `json:"image_vectors"`
+	MemoUID      string           `json:"memo_uid"`
+	Indexed      bool             `json:"indexed"`
+	TextCount    int              `json:"text_count"`
+	ImageCount   int              `json:"image_count"`
+	TextVectors  int              `json:"text_vectors"`
+	ImageVectors int              `json:"image_vectors"`
+	Detail       *MemoIndexDetail `json:"detail,omitempty"`
 }
 
 // GetMemoIndexInfo gets the index info of a memo.
-func (c *Client) GetMemoIndexInfo(ctx context.Context, memoName string) (*MemoIndexInfo, error) {
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet,
-		fmt.Sprintf("%s/internal/index/memo/%s", c.baseURL, memoName),
-		nil)
+func (c *Client) GetMemoIndexInfo(ctx context.Context, memoName string, includeDetail bool) (*MemoIndexInfo, error) {
+	url := fmt.Sprintf("%s/internal/index/memo/%s", c.baseURL, memoName)
+	if includeDetail {
+		url += "?include_detail=true"
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}

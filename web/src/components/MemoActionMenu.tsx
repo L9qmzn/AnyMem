@@ -4,6 +4,7 @@ import {
   ArchiveRestoreIcon,
   BookmarkMinusIcon,
   BookmarkPlusIcon,
+  CodeIcon,
   CopyIcon,
   DatabaseIcon,
   Edit3Icon,
@@ -18,6 +19,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import MemoIndexDetailDialog from "@/components/MemoIndexDetailDialog";
 import useNavigateTo from "@/hooks/useNavigateTo";
 import { aiServiceClient } from "@/helpers/ai-service";
 import { instanceStore, memoStore, userStore } from "@/store";
@@ -54,11 +56,13 @@ const MemoActionMenu = observer((props: Props) => {
   const navigateTo = useNavigateTo();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [removeTasksDialogOpen, setRemoveTasksDialogOpen] = useState(false);
+  const [indexDetailDialogOpen, setIndexDetailDialogOpen] = useState(false);
   const [isIndexing, setIsIndexing] = useState(false);
   const hasCompletedTaskList = checkHasCompletedTaskList(memo);
   const isInMemoDetailPage = location.pathname.startsWith(`/${memo.name}`);
   const isComment = Boolean(memo.parent);
   const isArchived = memo.state === State.ARCHIVED;
+  const isDeveloperMode = userStore.state.userGeneralSetting?.developerMode || false;
 
   const memoUpdatedCallback = () => {
     // Refresh user stats.
@@ -224,6 +228,12 @@ const MemoActionMenu = observer((props: Props) => {
             {isIndexing ? t("memo.generating-index") : t("memo.reindex")}
           </DropdownMenuItem>
         )}
+        {!isArchived && !isComment && isDeveloperMode && (
+          <DropdownMenuItem onClick={() => setIndexDetailDialogOpen(true)}>
+            <CodeIcon className="w-4 h-auto" />
+            {t("memo.index-detail.menu-item")}
+          </DropdownMenuItem>
+        )}
         {!readonly && (
           <>
             {!isArchived && !isComment && hasCompletedTaskList && (
@@ -266,6 +276,8 @@ const MemoActionMenu = observer((props: Props) => {
         onConfirm={confirmRemoveCompletedTaskListItems}
         confirmVariant="destructive"
       />
+      {/* Index detail dialog */}
+      <MemoIndexDetailDialog open={indexDetailDialogOpen} onOpenChange={setIndexDetailDialogOpen} memo={memo} />
     </DropdownMenu>
   );
 });

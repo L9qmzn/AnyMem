@@ -197,13 +197,18 @@ class IndexManager:
 
         return text_deleted, image_deleted
 
-    def get_memo_info(self, memo_uid: str) -> Optional[Dict]:
-        """Get indexing info for a specific memo."""
+    def get_memo_info(self, memo_uid: str, include_detail: bool = False) -> Optional[Dict]:
+        """Get indexing info for a specific memo.
+
+        Args:
+            memo_uid: The memo UID to get info for.
+            include_detail: If True, include detailed content (text chunks, image captions).
+        """
         if memo_uid not in self.memo_vector_map:
             return None
 
         mapping = self.memo_vector_map[memo_uid]
-        return {
+        info = {
             "memo_uid": memo_uid,
             "indexed": True,
             "text_vector_ids": mapping.get("text", []),
@@ -211,6 +216,69 @@ class IndexManager:
             "text_count": len(mapping.get("text", [])),
             "image_count": len(mapping.get("image", [])),
         }
+
+        if include_detail:
+            info["detail"] = self._get_memo_detail(memo_uid, mapping)
+
+        return info
+
+    def _get_memo_detail(self, memo_uid: str, mapping: Dict) -> Dict:
+        """Get detailed content for a memo from ChromaDB using metadata filter."""
+        detail = {
+            "text_chunks": [],
+            "images": [],
+        }
+
+        # Get text chunks from ChromaDB using memo_uid metadata filter
+        try:
+            chroma_client = PersistentClient(path=str(self.text_persist_dir))
+            collection = chroma_client.get_or_create_collection(name=self.text_collection)
+            results = collection.get(
+                where={"memo_uid": memo_uid},
+                include=["documents", "metadatas"]
+            )
+
+            if results and results.get("ids"):
+                for i, doc_id in enumerate(results["ids"]):
+                    doc_content = results["documents"][i] if results.get("documents") else ""
+                    metadata = results["metadatas"][i] if results.get("metadatas") else {}
+
+                    content_type = "memo_content"
+                    if metadata.get("source") == "memo_attachment":
+                        content_type = "attachment"
+
+                    detail["text_chunks"].append({
+                        "doc_id": doc_id,
+                        "content": doc_content[:500] + "..." if doc_content and len(doc_content) > 500 else (doc_content or ""),
+                        "content_type": content_type,
+                    })
+        except Exception as e:
+            print(f"Warning: Failed to get text chunks for {memo_uid}: {e}")
+
+        # Get image info from ChromaDB using memo_uid metadata filter
+        try:
+            chroma_client = PersistentClient(path=str(self.image_persist_dir))
+            collection = chroma_client.get_or_create_collection(name=self.image_collection)
+            results = collection.get(
+                where={"memo_uid": memo_uid},
+                include=["documents", "metadatas"]
+            )
+
+            if results and results.get("ids"):
+                for i, doc_id in enumerate(results["ids"]):
+                    caption = results["documents"][i] if results.get("documents") else ""
+                    metadata = results["metadatas"][i] if results.get("metadatas") else {}
+                    filename = metadata.get("filename", "")
+
+                    detail["images"].append({
+                        "doc_id": doc_id,
+                        "filename": filename,
+                        "caption": caption or "",
+                    })
+        except Exception as e:
+            print(f"Warning: Failed to get image info for {memo_uid}: {e}")
+
+        return detail
 
     def get_index_status(self) -> Dict:
         """Get overall index status."""

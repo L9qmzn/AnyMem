@@ -494,6 +494,8 @@ export interface GetMemoIndexInfoRequest {
    * Format: memos/{memo}
    */
   name: string;
+  /** Optional. If true, include detailed information (text chunks, image captions). */
+  includeDetail: boolean;
 }
 
 /** MemoIndexInfo contains the index information of a memo. */
@@ -506,6 +508,36 @@ export interface MemoIndexInfo {
   textVectors: number;
   /** Number of image vectors. */
   imageVectors: number;
+  /** Detailed index information (only returned when include_detail is true). */
+  detail?: MemoIndexDetail | undefined;
+}
+
+/** MemoIndexDetail contains detailed information about a memo's index. */
+export interface MemoIndexDetail {
+  /** Text chunks indexed for this memo. */
+  textChunks: TextChunk[];
+  /** Image descriptions indexed for this memo. */
+  images: ImageInfo[];
+}
+
+/** TextChunk represents a text segment that was indexed. */
+export interface TextChunk {
+  /** The document ID. */
+  docId: string;
+  /** The text content. */
+  content: string;
+  /** The type of content (e.g., "memo_content", "attachment"). */
+  contentType: string;
+}
+
+/** ImageInfo represents indexed image information. */
+export interface ImageInfo {
+  /** The document ID. */
+  docId: string;
+  /** The attachment name/filename. */
+  filename: string;
+  /** The AI-generated caption/description. */
+  caption: string;
 }
 
 /** AiSearchRequest is the request for AI semantic search. */
@@ -2785,13 +2817,16 @@ export const DeleteMemoIndexResponse: MessageFns<DeleteMemoIndexResponse> = {
 };
 
 function createBaseGetMemoIndexInfoRequest(): GetMemoIndexInfoRequest {
-  return { name: "" };
+  return { name: "", includeDetail: false };
 }
 
 export const GetMemoIndexInfoRequest: MessageFns<GetMemoIndexInfoRequest> = {
   encode(message: GetMemoIndexInfoRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
+    }
+    if (message.includeDetail !== false) {
+      writer.uint32(16).bool(message.includeDetail);
     }
     return writer;
   },
@@ -2811,6 +2846,14 @@ export const GetMemoIndexInfoRequest: MessageFns<GetMemoIndexInfoRequest> = {
           message.name = reader.string();
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.includeDetail = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2826,12 +2869,13 @@ export const GetMemoIndexInfoRequest: MessageFns<GetMemoIndexInfoRequest> = {
   fromPartial(object: DeepPartial<GetMemoIndexInfoRequest>): GetMemoIndexInfoRequest {
     const message = createBaseGetMemoIndexInfoRequest();
     message.name = object.name ?? "";
+    message.includeDetail = object.includeDetail ?? false;
     return message;
   },
 };
 
 function createBaseMemoIndexInfo(): MemoIndexInfo {
-  return { memoUid: "", indexed: false, textVectors: 0, imageVectors: 0 };
+  return { memoUid: "", indexed: false, textVectors: 0, imageVectors: 0, detail: undefined };
 }
 
 export const MemoIndexInfo: MessageFns<MemoIndexInfo> = {
@@ -2847,6 +2891,9 @@ export const MemoIndexInfo: MessageFns<MemoIndexInfo> = {
     }
     if (message.imageVectors !== 0) {
       writer.uint32(32).int32(message.imageVectors);
+    }
+    if (message.detail !== undefined) {
+      MemoIndexDetail.encode(message.detail, writer.uint32(42).fork()).join();
     }
     return writer;
   },
@@ -2890,6 +2937,14 @@ export const MemoIndexInfo: MessageFns<MemoIndexInfo> = {
           message.imageVectors = reader.int32();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.detail = MemoIndexDetail.decode(reader, reader.uint32());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2908,6 +2963,207 @@ export const MemoIndexInfo: MessageFns<MemoIndexInfo> = {
     message.indexed = object.indexed ?? false;
     message.textVectors = object.textVectors ?? 0;
     message.imageVectors = object.imageVectors ?? 0;
+    message.detail = (object.detail !== undefined && object.detail !== null)
+      ? MemoIndexDetail.fromPartial(object.detail)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseMemoIndexDetail(): MemoIndexDetail {
+  return { textChunks: [], images: [] };
+}
+
+export const MemoIndexDetail: MessageFns<MemoIndexDetail> = {
+  encode(message: MemoIndexDetail, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.textChunks) {
+      TextChunk.encode(v!, writer.uint32(10).fork()).join();
+    }
+    for (const v of message.images) {
+      ImageInfo.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MemoIndexDetail {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMemoIndexDetail();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.textChunks.push(TextChunk.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.images.push(ImageInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<MemoIndexDetail>): MemoIndexDetail {
+    return MemoIndexDetail.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MemoIndexDetail>): MemoIndexDetail {
+    const message = createBaseMemoIndexDetail();
+    message.textChunks = object.textChunks?.map((e) => TextChunk.fromPartial(e)) || [];
+    message.images = object.images?.map((e) => ImageInfo.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseTextChunk(): TextChunk {
+  return { docId: "", content: "", contentType: "" };
+}
+
+export const TextChunk: MessageFns<TextChunk> = {
+  encode(message: TextChunk, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.docId !== "") {
+      writer.uint32(10).string(message.docId);
+    }
+    if (message.content !== "") {
+      writer.uint32(18).string(message.content);
+    }
+    if (message.contentType !== "") {
+      writer.uint32(26).string(message.contentType);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): TextChunk {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTextChunk();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.docId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.content = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.contentType = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<TextChunk>): TextChunk {
+    return TextChunk.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TextChunk>): TextChunk {
+    const message = createBaseTextChunk();
+    message.docId = object.docId ?? "";
+    message.content = object.content ?? "";
+    message.contentType = object.contentType ?? "";
+    return message;
+  },
+};
+
+function createBaseImageInfo(): ImageInfo {
+  return { docId: "", filename: "", caption: "" };
+}
+
+export const ImageInfo: MessageFns<ImageInfo> = {
+  encode(message: ImageInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.docId !== "") {
+      writer.uint32(10).string(message.docId);
+    }
+    if (message.filename !== "") {
+      writer.uint32(18).string(message.filename);
+    }
+    if (message.caption !== "") {
+      writer.uint32(26).string(message.caption);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ImageInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseImageInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.docId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.filename = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.caption = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<ImageInfo>): ImageInfo {
+    return ImageInfo.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ImageInfo>): ImageInfo {
+    const message = createBaseImageInfo();
+    message.docId = object.docId ?? "";
+    message.filename = object.filename ?? "";
+    message.caption = object.caption ?? "";
     return message;
   },
 };

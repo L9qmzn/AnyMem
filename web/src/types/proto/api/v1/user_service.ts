@@ -336,6 +336,8 @@ export interface UserSetting_GeneralSetting {
   autoGenerateIndex: boolean;
   /** Whether to enable AI-powered semantic search instead of traditional keyword search. */
   enableAiSearch: boolean;
+  /** Whether to enable developer mode for viewing detailed AI index info. */
+  developerMode: boolean;
 }
 
 /** User authentication sessions configuration. */
@@ -1855,6 +1857,7 @@ function createBaseUserSetting_GeneralSetting(): UserSetting_GeneralSetting {
     autoGenerateTags: false,
     autoGenerateIndex: false,
     enableAiSearch: false,
+    developerMode: false,
   };
 }
 
@@ -1877,6 +1880,9 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
     }
     if (message.enableAiSearch !== false) {
       writer.uint32(56).bool(message.enableAiSearch);
+    }
+    if (message.developerMode !== false) {
+      writer.uint32(64).bool(message.developerMode);
     }
     return writer;
   },
@@ -1936,6 +1942,14 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
           message.enableAiSearch = reader.bool();
           continue;
         }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.developerMode = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1956,6 +1970,7 @@ export const UserSetting_GeneralSetting: MessageFns<UserSetting_GeneralSetting> 
     message.autoGenerateTags = object.autoGenerateTags ?? false;
     message.autoGenerateIndex = object.autoGenerateIndex ?? false;
     message.enableAiSearch = object.enableAiSearch ?? false;
+    message.developerMode = object.developerMode ?? false;
     return message;
   },
 };

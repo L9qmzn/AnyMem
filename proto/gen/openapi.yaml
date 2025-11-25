@@ -952,6 +952,11 @@ paths:
                   required: true
                   schema:
                     type: string
+                - name: includeDetail
+                  in: query
+                  description: Optional. If true, include detailed information (text chunks, image captions).
+                  schema:
+                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -2443,6 +2448,19 @@ components:
             properties:
                 oauth2Config:
                     $ref: '#/components/schemas/OAuth2Config'
+        ImageInfo:
+            type: object
+            properties:
+                docId:
+                    type: string
+                    description: The document ID.
+                filename:
+                    type: string
+                    description: The attachment name/filename.
+                caption:
+                    type: string
+                    description: The AI-generated caption/description.
+            description: ImageInfo represents indexed image information.
         IndexMemoRequest:
             required:
                 - name
@@ -2889,6 +2907,20 @@ components:
                     allOf:
                         - $ref: '#/components/schemas/Location'
                     description: Optional. The location of the memo.
+        MemoIndexDetail:
+            type: object
+            properties:
+                textChunks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/TextChunk'
+                    description: Text chunks indexed for this memo.
+                images:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ImageInfo'
+                    description: Image descriptions indexed for this memo.
+            description: MemoIndexDetail contains detailed information about a memo's index.
         MemoIndexInfo:
             type: object
             properties:
@@ -2906,6 +2938,10 @@ components:
                     type: integer
                     description: Number of image vectors.
                     format: int32
+                detail:
+                    allOf:
+                        - $ref: '#/components/schemas/MemoIndexDetail'
+                    description: Detailed index information (only returned when include_detail is true).
             description: MemoIndexInfo contains the index information of a memo.
         MemoRelation:
             required:
@@ -3126,6 +3162,19 @@ components:
                 usePathStyle:
                     type: boolean
             description: "S3 configuration for cloud storage backend.\r\n Reference: https://developers.cloudflare.com/r2/examples/aws/aws-sdk-go/"
+        TextChunk:
+            type: object
+            properties:
+                docId:
+                    type: string
+                    description: The document ID.
+                content:
+                    type: string
+                    description: The text content.
+                contentType:
+                    type: string
+                    description: The type of content (e.g., "memo_content", "attachment").
+            description: TextChunk represents a text segment that was indexed.
         UpsertMemoReactionRequest:
             required:
                 - name
@@ -3342,6 +3391,9 @@ components:
                 enableAiSearch:
                     type: boolean
                     description: Whether to enable AI-powered semantic search instead of traditional keyword search.
+                developerMode:
+                    type: boolean
+                    description: Whether to enable developer mode for viewing detailed AI index info.
             description: General user settings configuration.
         UserSetting_SessionsSetting:
             type: object

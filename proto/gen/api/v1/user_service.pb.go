@@ -2660,8 +2660,10 @@ type UserSetting_GeneralSetting struct {
 	AutoGenerateIndex bool `protobuf:"varint,6,opt,name=auto_generate_index,json=autoGenerateIndex,proto3" json:"auto_generate_index,omitempty"`
 	// Whether to enable AI-powered semantic search instead of traditional keyword search.
 	EnableAiSearch bool `protobuf:"varint,7,opt,name=enable_ai_search,json=enableAiSearch,proto3" json:"enable_ai_search,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Whether to enable developer mode for viewing detailed AI index info.
+	DeveloperMode bool `protobuf:"varint,8,opt,name=developer_mode,json=developerMode,proto3" json:"developer_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UserSetting_GeneralSetting) Reset() {
@@ -2732,6 +2734,13 @@ func (x *UserSetting_GeneralSetting) GetAutoGenerateIndex() bool {
 func (x *UserSetting_GeneralSetting) GetEnableAiSearch() bool {
 	if x != nil {
 		return x.EnableAiSearch
+	}
+	return false
+}
+
+func (x *UserSetting_GeneralSetting) GetDeveloperMode() bool {
+	if x != nil {
+		return x.DeveloperMode
 	}
 	return false
 }
@@ -3040,20 +3049,21 @@ const file_api_v1_user_service_proto_rawDesc = "" +
 	"\x11memos.api.v1/UserR\x04name\"\x19\n" +
 	"\x17ListAllUserStatsRequest\"I\n" +
 	"\x18ListAllUserStatsResponse\x12-\n" +
-	"\x05stats\x18\x01 \x03(\v2\x17.memos.api.v1.UserStatsR\x05stats\"\xcb\b\n" +
+	"\x05stats\x18\x01 \x03(\v2\x17.memos.api.v1.UserStatsR\x05stats\"\xf7\b\n" +
 	"\vUserSetting\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12S\n" +
 	"\x0fgeneral_setting\x18\x02 \x01(\v2(.memos.api.v1.UserSetting.GeneralSettingH\x00R\x0egeneralSetting\x12V\n" +
 	"\x10sessions_setting\x18\x03 \x01(\v2).memos.api.v1.UserSetting.SessionsSettingH\x00R\x0fsessionsSetting\x12c\n" +
 	"\x15access_tokens_setting\x18\x04 \x01(\v2-.memos.api.v1.UserSetting.AccessTokensSettingH\x00R\x13accessTokensSetting\x12V\n" +
-	"\x10webhooks_setting\x18\x05 \x01(\v2).memos.api.v1.UserSetting.WebhooksSettingH\x00R\x0fwebhooksSetting\x1a\x8d\x02\n" +
+	"\x10webhooks_setting\x18\x05 \x01(\v2).memos.api.v1.UserSetting.WebhooksSettingH\x00R\x0fwebhooksSetting\x1a\xb9\x02\n" +
 	"\x0eGeneralSetting\x12\x1b\n" +
 	"\x06locale\x18\x01 \x01(\tB\x03\xe0A\x01R\x06locale\x12,\n" +
 	"\x0fmemo_visibility\x18\x03 \x01(\tB\x03\xe0A\x01R\x0ememoVisibility\x12\x19\n" +
 	"\x05theme\x18\x04 \x01(\tB\x03\xe0A\x01R\x05theme\x121\n" +
 	"\x12auto_generate_tags\x18\x05 \x01(\bB\x03\xe0A\x01R\x10autoGenerateTags\x123\n" +
 	"\x13auto_generate_index\x18\x06 \x01(\bB\x03\xe0A\x01R\x11autoGenerateIndex\x12-\n" +
-	"\x10enable_ai_search\x18\a \x01(\bB\x03\xe0A\x01R\x0eenableAiSearch\x1aH\n" +
+	"\x10enable_ai_search\x18\a \x01(\bB\x03\xe0A\x01R\x0eenableAiSearch\x12*\n" +
+	"\x0edeveloper_mode\x18\b \x01(\bB\x03\xe0A\x01R\rdeveloperMode\x1aH\n" +
 	"\x0fSessionsSetting\x125\n" +
 	"\bsessions\x18\x01 \x03(\v2\x19.memos.api.v1.UserSessionR\bsessions\x1aY\n" +
 	"\x13AccessTokensSetting\x12B\n" +

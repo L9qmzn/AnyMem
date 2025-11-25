@@ -34,11 +34,29 @@ export interface SearchResponse {
   total_results: number;
 }
 
+export interface TextChunk {
+  doc_id: string;
+  content: string;
+  content_type: string;
+}
+
+export interface ImageInfo {
+  doc_id: string;
+  filename: string;
+  caption: string;
+}
+
+export interface MemoIndexDetail {
+  text_chunks: TextChunk[];
+  images: ImageInfo[];
+}
+
 export interface MemoIndexInfo {
   memo_uid: string;
   indexed: boolean;
   text_vectors: number;
   image_vectors: number;
+  detail?: MemoIndexDetail;
 }
 
 export interface RebuildIndexRequest {
@@ -118,17 +136,36 @@ export class AIServiceClient {
   }
 
   // 检查 Memo 索引状态 - 通过后端代理
-  async getMemoIndexInfo(memoName: string): Promise<MemoIndexInfo | null> {
+  async getMemoIndexInfo(memoName: string, includeDetail: boolean = false): Promise<MemoIndexInfo | null> {
     try {
       const response = await memoServiceClient.getMemoIndexInfo({
         name: memoName,
+        includeDetail: includeDetail,
       });
-      return {
+      const result: MemoIndexInfo = {
         memo_uid: response.memoUid,
         indexed: response.indexed,
         text_vectors: response.textVectors,
         image_vectors: response.imageVectors,
       };
+
+      // Add detail if available
+      if (includeDetail && response.detail) {
+        result.detail = {
+          text_chunks: (response.detail.textChunks || []).map((tc) => ({
+            doc_id: tc.docId,
+            content: tc.content,
+            content_type: tc.contentType,
+          })),
+          images: (response.detail.images || []).map((img) => ({
+            doc_id: img.docId,
+            filename: img.filename,
+            caption: img.caption,
+          })),
+        };
+      }
+
+      return result;
     } catch {
       return null;
     }

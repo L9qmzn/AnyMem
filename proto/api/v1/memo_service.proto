@@ -616,6 +616,8 @@ message GetMemoIndexInfoRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {type: "memos.api.v1/Memo"}
   ];
+  // Optional. If true, include detailed information (text chunks, image captions).
+  bool include_detail = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // MemoIndexInfo contains the index information of a memo.
@@ -628,6 +630,36 @@ message MemoIndexInfo {
   int32 text_vectors = 3;
   // Number of image vectors.
   int32 image_vectors = 4;
+  // Detailed index information (only returned when include_detail is true).
+  MemoIndexDetail detail = 5;
+}
+
+// MemoIndexDetail contains detailed information about a memo's index.
+message MemoIndexDetail {
+  // Text chunks indexed for this memo.
+  repeated TextChunk text_chunks = 1;
+  // Image descriptions indexed for this memo.
+  repeated ImageInfo images = 2;
+}
+
+// TextChunk represents a text segment that was indexed.
+message TextChunk {
+  // The document ID.
+  string doc_id = 1;
+  // The text content.
+  string content = 2;
+  // The type of content (e.g., "memo_content", "attachment").
+  string content_type = 3;
+}
+
+// ImageInfo represents indexed image information.
+message ImageInfo {
+  // The document ID.
+  string doc_id = 1;
+  // The attachment name/filename.
+  string filename = 2;
+  // The AI-generated caption/description.
+  string caption = 3;
 }
 
 // AiSearchRequest is the request for AI semantic search.

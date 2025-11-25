@@ -166,6 +166,20 @@
     "not-indexed": "未索引",
     "reindex": "重新索引",
     "click-to-index": "点击生成索引",
+    "index-detail": {
+      "menu-item": "索引详情",
+      "title": "AI 索引详情",
+      "fetch-error": "获取索引详情失败",
+      "memo-uid": "Memo UID",
+      "status": "状态",
+      "text-vectors": "文本向量数",
+      "image-vectors": "图片向量数",
+      "text-chunks": "文本块",
+      "images": "图片信息",
+      "caption": "AI 描述",
+      "no-caption": "无描述",
+      "no-detail": "暂无详细信息"
+    },
     "order-by": "排序",
     "remove-completed-task-list-items": "移除已办",
     "remove-completed-task-list-items-confirm": "您确定要移除所有完成的待办吗？（此操作不可逆）",
@@ -345,7 +359,9 @@
       "rebuilding-progress": "进度：{{completed}}/{{total}}",
       "rebuild-started": "索引重建已开始",
       "rebuild-completed": "索引重建完成：{{completed}}/{{total}} 条备忘录已索引",
-      "rebuild-failed": "索引重建失败"
+      "rebuild-failed": "索引重建失败",
+      "developer-mode": "开发者模式",
+      "developer-mode-description": "启用后可在 Memo 菜单中查看详细的 AI 索引信息（如图片描述等）"
     },
     "sso": "单点登录",
     "sso-section": {

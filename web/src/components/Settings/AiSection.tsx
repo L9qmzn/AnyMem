@@ -65,6 +65,10 @@ const AiSection = observer(() => {
     await userStore.updateUserGeneralSetting({ autoGenerateIndex: checked }, ["autoGenerateIndex"]);
   };
 
+  const handleDeveloperModeChange = async (checked: boolean) => {
+    await userStore.updateUserGeneralSetting({ developerMode: checked }, ["developerMode"]);
+  };
+
   const pollRebuildStatus = async (creator: string) => {
     try {
       const status = await aiServiceClient.getRebuildStatus(creator);
@@ -130,6 +134,7 @@ const AiSection = observer(() => {
     theme: "system",
     autoGenerateTags: false,
     autoGenerateIndex: false,
+    developerMode: false,
   };
 
   return (
@@ -167,6 +172,9 @@ const AiSection = observer(() => {
           <Button onClick={handleRebuildIndex} disabled={isRebuilding} variant={isRebuilding ? "secondary" : "default"} size="sm">
             {isRebuilding ? t("setting.ai-section.rebuilding") : t("setting.ai-section.rebuild-index-button")}
           </Button>
+        </SettingRow>
+        <SettingRow label={t("setting.ai-section.developer-mode")} description={t("setting.ai-section.developer-mode-description")}>
+          <Switch checked={setting.developerMode || false} onCheckedChange={handleDeveloperModeChange} />
         </SettingRow>
       </SettingGroup>
     </SettingSection>

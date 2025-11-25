@@ -291,10 +291,15 @@ async def delete_memo_index(memo_uid: str):
 
 
 @router.get("/memo/{memo_uid:path}")
-async def get_memo_index_info(memo_uid: str):
-    """获取Memo的索引信息"""
+async def get_memo_index_info(memo_uid: str, include_detail: bool = False):
+    """获取Memo的索引信息
+
+    Args:
+        memo_uid: Memo UID
+        include_detail: 是否包含详细信息（文本内容、图片描述等）
+    """
     manager = get_index_manager()
-    info = manager.get_memo_info(memo_uid)
+    info = manager.get_memo_info(memo_uid, include_detail=include_detail)
 
     if info is None:
         raise HTTPException(status_code=404, detail=f"Memo {memo_uid} not indexed")

@@ -438,6 +438,8 @@ message UserSetting {
     bool auto_generate_index = 6 [(google.api.field_behavior) = OPTIONAL];
     // Whether to enable AI-powered semantic search instead of traditional keyword search.
     bool enable_ai_search = 7 [(google.api.field_behavior) = OPTIONAL];
+    // Whether to enable developer mode for viewing detailed AI index info.
+    bool developer_mode = 8 [(google.api.field_behavior) = OPTIONAL];
   }
 
   // User authentication sessions configuration.

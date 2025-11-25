@@ -310,7 +310,7 @@ func (s *APIV1Service) GetMemoIndexInfo(ctx context.Context, request *v1pb.GetMe
 		return nil, grpcstatus.Errorf(codes.Internal, "failed to get AI client: %v", err)
 	}
 
-	info, err := aiClient.GetMemoIndexInfo(ctx, request.Name)
+	info, err := aiClient.GetMemoIndexInfo(ctx, request.Name, request.IncludeDetail)
 	if err != nil {
 		return nil, grpcstatus.Errorf(codes.Internal, "failed to get memo index info: %v", err)
 	}
@@ -321,12 +321,40 @@ func (s *APIV1Service) GetMemoIndexInfo(ctx context.Context, request *v1pb.GetMe
 		}, nil
 	}
 
-	return &v1pb.MemoIndexInfo{
+	result := &v1pb.MemoIndexInfo{
 		MemoUid:      info.MemoUID,
 		Indexed:      info.Indexed,
 		TextVectors:  int32(info.TextCount),
 		ImageVectors: int32(info.ImageCount),
-	}, nil
+	}
+
+	// Add detail if requested and available
+	if request.IncludeDetail && info.Detail != nil {
+		detail := &v1pb.MemoIndexDetail{
+			TextChunks: make([]*v1pb.TextChunk, 0, len(info.Detail.TextChunks)),
+			Images:     make([]*v1pb.ImageInfo, 0, len(info.Detail.Images)),
+		}
+
+		for _, tc := range info.Detail.TextChunks {
+			detail.TextChunks = append(detail.TextChunks, &v1pb.TextChunk{
+				DocId:       tc.DocID,
+				Content:     tc.Content,
+				ContentType: tc.ContentType,
+			})
+		}
+
+		for _, img := range info.Detail.Images {
+			detail.Images = append(detail.Images, &v1pb.ImageInfo{
+				DocId:    img.DocID,
+				Filename: img.Filename,
+				Caption:  img.Caption,
+			})
+		}
+
+		result.Detail = detail
+	}
+
+	return result, nil
 }
 
 // AiSearch performs AI semantic search on memos.

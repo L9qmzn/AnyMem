@@ -345,6 +345,7 @@ func getDefaultUserGeneralSetting() *v1pb.UserSetting_GeneralSetting {
 		AutoGenerateTags:  false,
 		AutoGenerateIndex: false,
 		EnableAiSearch:    false,
+		DeveloperMode:     false,
 	}
 }
 
@@ -439,6 +440,7 @@ func (s *APIV1Service) UpdateUserSetting(ctx context.Context, request *v1pb.Upda
 		AutoGenerateTags:  generalSetting.GetAutoGenerateTags(),
 		AutoGenerateIndex: generalSetting.GetAutoGenerateIndex(),
 		EnableAiSearch:    generalSetting.GetEnableAiSearch(),
+		DeveloperMode:     generalSetting.GetDeveloperMode(),
 	}
 
 	// Apply updates for fields specified in the update mask
@@ -457,6 +459,8 @@ func (s *APIV1Service) UpdateUserSetting(ctx context.Context, request *v1pb.Upda
 			updatedGeneral.AutoGenerateIndex = incomingGeneral.AutoGenerateIndex
 		case "enableAiSearch":
 			updatedGeneral.EnableAiSearch = incomingGeneral.EnableAiSearch
+		case "developerMode":
+			updatedGeneral.DeveloperMode = incomingGeneral.DeveloperMode
 		default:
 			// Ignore unsupported fields
 		}
@@ -1313,6 +1317,7 @@ func convertUserSettingFromStore(storeSetting *storepb.UserSetting, userID int32
 					AutoGenerateTags:  general.AutoGenerateTags,
 					AutoGenerateIndex: general.AutoGenerateIndex,
 					EnableAiSearch:    general.EnableAiSearch,
+					DeveloperMode:     general.DeveloperMode,
 				},
 			}
 		} else {
@@ -1404,6 +1409,7 @@ func convertUserSettingToStore(apiSetting *v1pb.UserSetting, userID int32, key s
 					AutoGenerateTags:  general.AutoGenerateTags,
 					AutoGenerateIndex: general.AutoGenerateIndex,
 					EnableAiSearch:    general.EnableAiSearch,
+					DeveloperMode:     general.DeveloperMode,
 				},
 			}
 		} else {

@@ -1979,7 +1979,9 @@ type GetMemoIndexInfoRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Required. The resource name of the memo.
 	// Format: memos/{memo}
-	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Optional. If true, include detailed information (text chunks, image captions).
+	IncludeDetail bool `protobuf:"varint,2,opt,name=include_detail,json=includeDetail,proto3" json:"include_detail,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2021,6 +2023,13 @@ func (x *GetMemoIndexInfoRequest) GetName() string {
 	return ""
 }
 
+func (x *GetMemoIndexInfoRequest) GetIncludeDetail() bool {
+	if x != nil {
+		return x.IncludeDetail
+	}
+	return false
+}
+
 // MemoIndexInfo contains the index information of a memo.
 type MemoIndexInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -2031,7 +2040,9 @@ type MemoIndexInfo struct {
 	// Number of text vectors.
 	TextVectors int32 `protobuf:"varint,3,opt,name=text_vectors,json=textVectors,proto3" json:"text_vectors,omitempty"`
 	// Number of image vectors.
-	ImageVectors  int32 `protobuf:"varint,4,opt,name=image_vectors,json=imageVectors,proto3" json:"image_vectors,omitempty"`
+	ImageVectors int32 `protobuf:"varint,4,opt,name=image_vectors,json=imageVectors,proto3" json:"image_vectors,omitempty"`
+	// Detailed index information (only returned when include_detail is true).
+	Detail        *MemoIndexDetail `protobuf:"bytes,5,opt,name=detail,proto3" json:"detail,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2094,6 +2105,196 @@ func (x *MemoIndexInfo) GetImageVectors() int32 {
 	return 0
 }
 
+func (x *MemoIndexInfo) GetDetail() *MemoIndexDetail {
+	if x != nil {
+		return x.Detail
+	}
+	return nil
+}
+
+// MemoIndexDetail contains detailed information about a memo's index.
+type MemoIndexDetail struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Text chunks indexed for this memo.
+	TextChunks []*TextChunk `protobuf:"bytes,1,rep,name=text_chunks,json=textChunks,proto3" json:"text_chunks,omitempty"`
+	// Image descriptions indexed for this memo.
+	Images        []*ImageInfo `protobuf:"bytes,2,rep,name=images,proto3" json:"images,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MemoIndexDetail) Reset() {
+	*x = MemoIndexDetail{}
+	mi := &file_api_v1_memo_service_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MemoIndexDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MemoIndexDetail) ProtoMessage() {}
+
+func (x *MemoIndexDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_memo_service_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MemoIndexDetail.ProtoReflect.Descriptor instead.
+func (*MemoIndexDetail) Descriptor() ([]byte, []int) {
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *MemoIndexDetail) GetTextChunks() []*TextChunk {
+	if x != nil {
+		return x.TextChunks
+	}
+	return nil
+}
+
+func (x *MemoIndexDetail) GetImages() []*ImageInfo {
+	if x != nil {
+		return x.Images
+	}
+	return nil
+}
+
+// TextChunk represents a text segment that was indexed.
+type TextChunk struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The document ID.
+	DocId string `protobuf:"bytes,1,opt,name=doc_id,json=docId,proto3" json:"doc_id,omitempty"`
+	// The text content.
+	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	// The type of content (e.g., "memo_content", "attachment").
+	ContentType   string `protobuf:"bytes,3,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TextChunk) Reset() {
+	*x = TextChunk{}
+	mi := &file_api_v1_memo_service_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TextChunk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TextChunk) ProtoMessage() {}
+
+func (x *TextChunk) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_memo_service_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TextChunk.ProtoReflect.Descriptor instead.
+func (*TextChunk) Descriptor() ([]byte, []int) {
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *TextChunk) GetDocId() string {
+	if x != nil {
+		return x.DocId
+	}
+	return ""
+}
+
+func (x *TextChunk) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *TextChunk) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+// ImageInfo represents indexed image information.
+type ImageInfo struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The document ID.
+	DocId string `protobuf:"bytes,1,opt,name=doc_id,json=docId,proto3" json:"doc_id,omitempty"`
+	// The attachment name/filename.
+	Filename string `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	// The AI-generated caption/description.
+	Caption       string `protobuf:"bytes,3,opt,name=caption,proto3" json:"caption,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImageInfo) Reset() {
+	*x = ImageInfo{}
+	mi := &file_api_v1_memo_service_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImageInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImageInfo) ProtoMessage() {}
+
+func (x *ImageInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_memo_service_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImageInfo.ProtoReflect.Descriptor instead.
+func (*ImageInfo) Descriptor() ([]byte, []int) {
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *ImageInfo) GetDocId() string {
+	if x != nil {
+		return x.DocId
+	}
+	return ""
+}
+
+func (x *ImageInfo) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *ImageInfo) GetCaption() string {
+	if x != nil {
+		return x.Caption
+	}
+	return ""
+}
+
 // AiSearchRequest is the request for AI semantic search.
 type AiSearchRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -2114,7 +2315,7 @@ type AiSearchRequest struct {
 
 func (x *AiSearchRequest) Reset() {
 	*x = AiSearchRequest{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[31]
+	mi := &file_api_v1_memo_service_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2126,7 +2327,7 @@ func (x *AiSearchRequest) String() string {
 func (*AiSearchRequest) ProtoMessage() {}
 
 func (x *AiSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[31]
+	mi := &file_api_v1_memo_service_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2139,7 +2340,7 @@ func (x *AiSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiSearchRequest.ProtoReflect.Descriptor instead.
 func (*AiSearchRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{31}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *AiSearchRequest) GetQuery() string {
@@ -2194,7 +2395,7 @@ type AiSearchResponse struct {
 
 func (x *AiSearchResponse) Reset() {
 	*x = AiSearchResponse{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[32]
+	mi := &file_api_v1_memo_service_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2206,7 +2407,7 @@ func (x *AiSearchResponse) String() string {
 func (*AiSearchResponse) ProtoMessage() {}
 
 func (x *AiSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[32]
+	mi := &file_api_v1_memo_service_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2219,7 +2420,7 @@ func (x *AiSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiSearchResponse.ProtoReflect.Descriptor instead.
 func (*AiSearchResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{32}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *AiSearchResponse) GetResults() []*AiSearchResult {
@@ -2267,7 +2468,7 @@ type AiSearchResult struct {
 
 func (x *AiSearchResult) Reset() {
 	*x = AiSearchResult{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[33]
+	mi := &file_api_v1_memo_service_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2279,7 +2480,7 @@ func (x *AiSearchResult) String() string {
 func (*AiSearchResult) ProtoMessage() {}
 
 func (x *AiSearchResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[33]
+	mi := &file_api_v1_memo_service_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2292,7 +2493,7 @@ func (x *AiSearchResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiSearchResult.ProtoReflect.Descriptor instead.
 func (*AiSearchResult) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{33}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *AiSearchResult) GetMemoUid() string {
@@ -2335,7 +2536,7 @@ type RebuildIndexRequest struct {
 
 func (x *RebuildIndexRequest) Reset() {
 	*x = RebuildIndexRequest{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[34]
+	mi := &file_api_v1_memo_service_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2347,7 +2548,7 @@ func (x *RebuildIndexRequest) String() string {
 func (*RebuildIndexRequest) ProtoMessage() {}
 
 func (x *RebuildIndexRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[34]
+	mi := &file_api_v1_memo_service_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2360,7 +2561,7 @@ func (x *RebuildIndexRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RebuildIndexRequest.ProtoReflect.Descriptor instead.
 func (*RebuildIndexRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{34}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *RebuildIndexRequest) GetCreator() string {
@@ -2387,7 +2588,7 @@ type RebuildIndexResponse struct {
 
 func (x *RebuildIndexResponse) Reset() {
 	*x = RebuildIndexResponse{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[35]
+	mi := &file_api_v1_memo_service_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2399,7 +2600,7 @@ func (x *RebuildIndexResponse) String() string {
 func (*RebuildIndexResponse) ProtoMessage() {}
 
 func (x *RebuildIndexResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[35]
+	mi := &file_api_v1_memo_service_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2412,7 +2613,7 @@ func (x *RebuildIndexResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RebuildIndexResponse.ProtoReflect.Descriptor instead.
 func (*RebuildIndexResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{35}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *RebuildIndexResponse) GetCreator() string {
@@ -2455,7 +2656,7 @@ type GetRebuildStatusRequest struct {
 
 func (x *GetRebuildStatusRequest) Reset() {
 	*x = GetRebuildStatusRequest{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[36]
+	mi := &file_api_v1_memo_service_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2467,7 +2668,7 @@ func (x *GetRebuildStatusRequest) String() string {
 func (*GetRebuildStatusRequest) ProtoMessage() {}
 
 func (x *GetRebuildStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[36]
+	mi := &file_api_v1_memo_service_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2480,7 +2681,7 @@ func (x *GetRebuildStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRebuildStatusRequest.ProtoReflect.Descriptor instead.
 func (*GetRebuildStatusRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{36}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetRebuildStatusRequest) GetCreator() string {
@@ -2513,7 +2714,7 @@ type RebuildTaskStatus struct {
 
 func (x *RebuildTaskStatus) Reset() {
 	*x = RebuildTaskStatus{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[37]
+	mi := &file_api_v1_memo_service_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2525,7 +2726,7 @@ func (x *RebuildTaskStatus) String() string {
 func (*RebuildTaskStatus) ProtoMessage() {}
 
 func (x *RebuildTaskStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[37]
+	mi := &file_api_v1_memo_service_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2538,7 +2739,7 @@ func (x *RebuildTaskStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RebuildTaskStatus.ProtoReflect.Descriptor instead.
 func (*RebuildTaskStatus) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{37}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *RebuildTaskStatus) GetStatus() string {
@@ -2599,7 +2800,7 @@ type AiHealthCheckRequest struct {
 
 func (x *AiHealthCheckRequest) Reset() {
 	*x = AiHealthCheckRequest{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[38]
+	mi := &file_api_v1_memo_service_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2611,7 +2812,7 @@ func (x *AiHealthCheckRequest) String() string {
 func (*AiHealthCheckRequest) ProtoMessage() {}
 
 func (x *AiHealthCheckRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[38]
+	mi := &file_api_v1_memo_service_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2624,7 +2825,7 @@ func (x *AiHealthCheckRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiHealthCheckRequest.ProtoReflect.Descriptor instead.
 func (*AiHealthCheckRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{38}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{41}
 }
 
 // AiHealthCheckResponse is the response of AI health check.
@@ -2638,7 +2839,7 @@ type AiHealthCheckResponse struct {
 
 func (x *AiHealthCheckResponse) Reset() {
 	*x = AiHealthCheckResponse{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[39]
+	mi := &file_api_v1_memo_service_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2650,7 +2851,7 @@ func (x *AiHealthCheckResponse) String() string {
 func (*AiHealthCheckResponse) ProtoMessage() {}
 
 func (x *AiHealthCheckResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[39]
+	mi := &file_api_v1_memo_service_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2663,7 +2864,7 @@ func (x *AiHealthCheckResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiHealthCheckResponse.ProtoReflect.Descriptor instead.
 func (*AiHealthCheckResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{39}
+	return file_api_v1_memo_service_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *AiHealthCheckResponse) GetHealthy() bool {
@@ -2686,7 +2887,7 @@ type Memo_Property struct {
 
 func (x *Memo_Property) Reset() {
 	*x = Memo_Property{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[40]
+	mi := &file_api_v1_memo_service_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2698,7 +2899,7 @@ func (x *Memo_Property) String() string {
 func (*Memo_Property) ProtoMessage() {}
 
 func (x *Memo_Property) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[40]
+	mi := &file_api_v1_memo_service_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2756,7 +2957,7 @@ type MemoRelation_Memo struct {
 
 func (x *MemoRelation_Memo) Reset() {
 	*x = MemoRelation_Memo{}
-	mi := &file_api_v1_memo_service_proto_msgTypes[41]
+	mi := &file_api_v1_memo_service_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2768,7 +2969,7 @@ func (x *MemoRelation_Memo) String() string {
 func (*MemoRelation_Memo) ProtoMessage() {}
 
 func (x *MemoRelation_Memo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_memo_service_proto_msgTypes[41]
+	mi := &file_api_v1_memo_service_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2967,15 +3168,29 @@ const file_api_v1_memo_service_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tB\x19\xe0A\x02\xfaA\x13\n" +
 	"\x11memos.api.v1/MemoR\x04name\"3\n" +
 	"\x17DeleteMemoIndexResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\"H\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"t\n" +
 	"\x17GetMemoIndexInfoRequest\x12-\n" +
 	"\x04name\x18\x01 \x01(\tB\x19\xe0A\x02\xfaA\x13\n" +
-	"\x11memos.api.v1/MemoR\x04name\"\x8c\x01\n" +
+	"\x11memos.api.v1/MemoR\x04name\x12*\n" +
+	"\x0einclude_detail\x18\x02 \x01(\bB\x03\xe0A\x01R\rincludeDetail\"\xc3\x01\n" +
 	"\rMemoIndexInfo\x12\x19\n" +
 	"\bmemo_uid\x18\x01 \x01(\tR\amemoUid\x12\x18\n" +
 	"\aindexed\x18\x02 \x01(\bR\aindexed\x12!\n" +
 	"\ftext_vectors\x18\x03 \x01(\x05R\vtextVectors\x12#\n" +
-	"\rimage_vectors\x18\x04 \x01(\x05R\fimageVectors\"\x99\x01\n" +
+	"\rimage_vectors\x18\x04 \x01(\x05R\fimageVectors\x125\n" +
+	"\x06detail\x18\x05 \x01(\v2\x1d.memos.api.v1.MemoIndexDetailR\x06detail\"|\n" +
+	"\x0fMemoIndexDetail\x128\n" +
+	"\vtext_chunks\x18\x01 \x03(\v2\x17.memos.api.v1.TextChunkR\n" +
+	"textChunks\x12/\n" +
+	"\x06images\x18\x02 \x03(\v2\x17.memos.api.v1.ImageInfoR\x06images\"_\n" +
+	"\tTextChunk\x12\x15\n" +
+	"\x06doc_id\x18\x01 \x01(\tR\x05docId\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12!\n" +
+	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\"X\n" +
+	"\tImageInfo\x12\x15\n" +
+	"\x06doc_id\x18\x01 \x01(\tR\x05docId\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x18\n" +
+	"\acaption\x18\x03 \x01(\tR\acaption\"\x99\x01\n" +
 	"\x0fAiSearchRequest\x12\x19\n" +
 	"\x05query\x18\x01 \x01(\tB\x03\xe0A\x02R\x05query\x12\x13\n" +
 	"\x05top_k\x18\x02 \x01(\x05R\x04topK\x12\x1f\n" +
@@ -3066,7 +3281,7 @@ func file_api_v1_memo_service_proto_rawDescGZIP() []byte {
 }
 
 var file_api_v1_memo_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_api_v1_memo_service_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
+var file_api_v1_memo_service_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
 var file_api_v1_memo_service_proto_goTypes = []any{
 	(Visibility)(0),                     // 0: memos.api.v1.Visibility
 	(MemoRelation_Type)(0),              // 1: memos.api.v1.MemoRelation.Type
@@ -3101,44 +3316,47 @@ var file_api_v1_memo_service_proto_goTypes = []any{
 	(*DeleteMemoIndexResponse)(nil),     // 30: memos.api.v1.DeleteMemoIndexResponse
 	(*GetMemoIndexInfoRequest)(nil),     // 31: memos.api.v1.GetMemoIndexInfoRequest
 	(*MemoIndexInfo)(nil),               // 32: memos.api.v1.MemoIndexInfo
-	(*AiSearchRequest)(nil),             // 33: memos.api.v1.AiSearchRequest
-	(*AiSearchResponse)(nil),            // 34: memos.api.v1.AiSearchResponse
-	(*AiSearchResult)(nil),              // 35: memos.api.v1.AiSearchResult
-	(*RebuildIndexRequest)(nil),         // 36: memos.api.v1.RebuildIndexRequest
-	(*RebuildIndexResponse)(nil),        // 37: memos.api.v1.RebuildIndexResponse
-	(*GetRebuildStatusRequest)(nil),     // 38: memos.api.v1.GetRebuildStatusRequest
-	(*RebuildTaskStatus)(nil),           // 39: memos.api.v1.RebuildTaskStatus
-	(*AiHealthCheckRequest)(nil),        // 40: memos.api.v1.AiHealthCheckRequest
-	(*AiHealthCheckResponse)(nil),       // 41: memos.api.v1.AiHealthCheckResponse
-	(*Memo_Property)(nil),               // 42: memos.api.v1.Memo.Property
-	(*MemoRelation_Memo)(nil),           // 43: memos.api.v1.MemoRelation.Memo
-	(*timestamppb.Timestamp)(nil),       // 44: google.protobuf.Timestamp
-	(State)(0),                          // 45: memos.api.v1.State
-	(*Attachment)(nil),                  // 46: memos.api.v1.Attachment
-	(*fieldmaskpb.FieldMask)(nil),       // 47: google.protobuf.FieldMask
-	(*emptypb.Empty)(nil),               // 48: google.protobuf.Empty
+	(*MemoIndexDetail)(nil),             // 33: memos.api.v1.MemoIndexDetail
+	(*TextChunk)(nil),                   // 34: memos.api.v1.TextChunk
+	(*ImageInfo)(nil),                   // 35: memos.api.v1.ImageInfo
+	(*AiSearchRequest)(nil),             // 36: memos.api.v1.AiSearchRequest
+	(*AiSearchResponse)(nil),            // 37: memos.api.v1.AiSearchResponse
+	(*AiSearchResult)(nil),              // 38: memos.api.v1.AiSearchResult
+	(*RebuildIndexRequest)(nil),         // 39: memos.api.v1.RebuildIndexRequest
+	(*RebuildIndexResponse)(nil),        // 40: memos.api.v1.RebuildIndexResponse
+	(*GetRebuildStatusRequest)(nil),     // 41: memos.api.v1.GetRebuildStatusRequest
+	(*RebuildTaskStatus)(nil),           // 42: memos.api.v1.RebuildTaskStatus
+	(*AiHealthCheckRequest)(nil),        // 43: memos.api.v1.AiHealthCheckRequest
+	(*AiHealthCheckResponse)(nil),       // 44: memos.api.v1.AiHealthCheckResponse
+	(*Memo_Property)(nil),               // 45: memos.api.v1.Memo.Property
+	(*MemoRelation_Memo)(nil),           // 46: memos.api.v1.MemoRelation.Memo
+	(*timestamppb.Timestamp)(nil),       // 47: google.protobuf.Timestamp
+	(State)(0),                          // 48: memos.api.v1.State
+	(*Attachment)(nil),                  // 49: memos.api.v1.Attachment
+	(*fieldmaskpb.FieldMask)(nil),       // 50: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),               // 51: google.protobuf.Empty
 }
 var file_api_v1_memo_service_proto_depIdxs = []int32{
-	44, // 0: memos.api.v1.Reaction.create_time:type_name -> google.protobuf.Timestamp
-	45, // 1: memos.api.v1.Memo.state:type_name -> memos.api.v1.State
-	44, // 2: memos.api.v1.Memo.create_time:type_name -> google.protobuf.Timestamp
-	44, // 3: memos.api.v1.Memo.update_time:type_name -> google.protobuf.Timestamp
-	44, // 4: memos.api.v1.Memo.display_time:type_name -> google.protobuf.Timestamp
+	47, // 0: memos.api.v1.Reaction.create_time:type_name -> google.protobuf.Timestamp
+	48, // 1: memos.api.v1.Memo.state:type_name -> memos.api.v1.State
+	47, // 2: memos.api.v1.Memo.create_time:type_name -> google.protobuf.Timestamp
+	47, // 3: memos.api.v1.Memo.update_time:type_name -> google.protobuf.Timestamp
+	47, // 4: memos.api.v1.Memo.display_time:type_name -> google.protobuf.Timestamp
 	0,  // 5: memos.api.v1.Memo.visibility:type_name -> memos.api.v1.Visibility
-	46, // 6: memos.api.v1.Memo.attachments:type_name -> memos.api.v1.Attachment
+	49, // 6: memos.api.v1.Memo.attachments:type_name -> memos.api.v1.Attachment
 	14, // 7: memos.api.v1.Memo.relations:type_name -> memos.api.v1.MemoRelation
 	2,  // 8: memos.api.v1.Memo.reactions:type_name -> memos.api.v1.Reaction
-	42, // 9: memos.api.v1.Memo.property:type_name -> memos.api.v1.Memo.Property
+	45, // 9: memos.api.v1.Memo.property:type_name -> memos.api.v1.Memo.Property
 	4,  // 10: memos.api.v1.Memo.location:type_name -> memos.api.v1.Location
 	3,  // 11: memos.api.v1.CreateMemoRequest.memo:type_name -> memos.api.v1.Memo
-	45, // 12: memos.api.v1.ListMemosRequest.state:type_name -> memos.api.v1.State
+	48, // 12: memos.api.v1.ListMemosRequest.state:type_name -> memos.api.v1.State
 	3,  // 13: memos.api.v1.ListMemosResponse.memos:type_name -> memos.api.v1.Memo
 	3,  // 14: memos.api.v1.UpdateMemoRequest.memo:type_name -> memos.api.v1.Memo
-	47, // 15: memos.api.v1.UpdateMemoRequest.update_mask:type_name -> google.protobuf.FieldMask
-	46, // 16: memos.api.v1.SetMemoAttachmentsRequest.attachments:type_name -> memos.api.v1.Attachment
-	46, // 17: memos.api.v1.ListMemoAttachmentsResponse.attachments:type_name -> memos.api.v1.Attachment
-	43, // 18: memos.api.v1.MemoRelation.memo:type_name -> memos.api.v1.MemoRelation.Memo
-	43, // 19: memos.api.v1.MemoRelation.related_memo:type_name -> memos.api.v1.MemoRelation.Memo
+	50, // 15: memos.api.v1.UpdateMemoRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 16: memos.api.v1.SetMemoAttachmentsRequest.attachments:type_name -> memos.api.v1.Attachment
+	49, // 17: memos.api.v1.ListMemoAttachmentsResponse.attachments:type_name -> memos.api.v1.Attachment
+	46, // 18: memos.api.v1.MemoRelation.memo:type_name -> memos.api.v1.MemoRelation.Memo
+	46, // 19: memos.api.v1.MemoRelation.related_memo:type_name -> memos.api.v1.MemoRelation.Memo
 	1,  // 20: memos.api.v1.MemoRelation.type:type_name -> memos.api.v1.MemoRelation.Type
 	14, // 21: memos.api.v1.SetMemoRelationsRequest.relations:type_name -> memos.api.v1.MemoRelation
 	14, // 22: memos.api.v1.ListMemoRelationsResponse.relations:type_name -> memos.api.v1.MemoRelation
@@ -3146,56 +3364,59 @@ var file_api_v1_memo_service_proto_depIdxs = []int32{
 	3,  // 24: memos.api.v1.ListMemoCommentsResponse.memos:type_name -> memos.api.v1.Memo
 	2,  // 25: memos.api.v1.ListMemoReactionsResponse.reactions:type_name -> memos.api.v1.Reaction
 	2,  // 26: memos.api.v1.UpsertMemoReactionRequest.reaction:type_name -> memos.api.v1.Reaction
-	35, // 27: memos.api.v1.AiSearchResponse.results:type_name -> memos.api.v1.AiSearchResult
-	5,  // 28: memos.api.v1.MemoService.CreateMemo:input_type -> memos.api.v1.CreateMemoRequest
-	6,  // 29: memos.api.v1.MemoService.ListMemos:input_type -> memos.api.v1.ListMemosRequest
-	8,  // 30: memos.api.v1.MemoService.GetMemo:input_type -> memos.api.v1.GetMemoRequest
-	9,  // 31: memos.api.v1.MemoService.UpdateMemo:input_type -> memos.api.v1.UpdateMemoRequest
-	10, // 32: memos.api.v1.MemoService.DeleteMemo:input_type -> memos.api.v1.DeleteMemoRequest
-	11, // 33: memos.api.v1.MemoService.SetMemoAttachments:input_type -> memos.api.v1.SetMemoAttachmentsRequest
-	12, // 34: memos.api.v1.MemoService.ListMemoAttachments:input_type -> memos.api.v1.ListMemoAttachmentsRequest
-	15, // 35: memos.api.v1.MemoService.SetMemoRelations:input_type -> memos.api.v1.SetMemoRelationsRequest
-	16, // 36: memos.api.v1.MemoService.ListMemoRelations:input_type -> memos.api.v1.ListMemoRelationsRequest
-	18, // 37: memos.api.v1.MemoService.CreateMemoComment:input_type -> memos.api.v1.CreateMemoCommentRequest
-	19, // 38: memos.api.v1.MemoService.ListMemoComments:input_type -> memos.api.v1.ListMemoCommentsRequest
-	21, // 39: memos.api.v1.MemoService.ListMemoReactions:input_type -> memos.api.v1.ListMemoReactionsRequest
-	23, // 40: memos.api.v1.MemoService.UpsertMemoReaction:input_type -> memos.api.v1.UpsertMemoReactionRequest
-	24, // 41: memos.api.v1.MemoService.DeleteMemoReaction:input_type -> memos.api.v1.DeleteMemoReactionRequest
-	25, // 42: memos.api.v1.MemoService.GenerateAiTags:input_type -> memos.api.v1.GenerateAiTagsRequest
-	27, // 43: memos.api.v1.MemoService.IndexMemo:input_type -> memos.api.v1.IndexMemoRequest
-	29, // 44: memos.api.v1.MemoService.DeleteMemoIndex:input_type -> memos.api.v1.DeleteMemoIndexRequest
-	31, // 45: memos.api.v1.MemoService.GetMemoIndexInfo:input_type -> memos.api.v1.GetMemoIndexInfoRequest
-	33, // 46: memos.api.v1.MemoService.AiSearch:input_type -> memos.api.v1.AiSearchRequest
-	36, // 47: memos.api.v1.MemoService.RebuildIndex:input_type -> memos.api.v1.RebuildIndexRequest
-	38, // 48: memos.api.v1.MemoService.GetRebuildStatus:input_type -> memos.api.v1.GetRebuildStatusRequest
-	40, // 49: memos.api.v1.MemoService.AiHealthCheck:input_type -> memos.api.v1.AiHealthCheckRequest
-	3,  // 50: memos.api.v1.MemoService.CreateMemo:output_type -> memos.api.v1.Memo
-	7,  // 51: memos.api.v1.MemoService.ListMemos:output_type -> memos.api.v1.ListMemosResponse
-	3,  // 52: memos.api.v1.MemoService.GetMemo:output_type -> memos.api.v1.Memo
-	3,  // 53: memos.api.v1.MemoService.UpdateMemo:output_type -> memos.api.v1.Memo
-	48, // 54: memos.api.v1.MemoService.DeleteMemo:output_type -> google.protobuf.Empty
-	48, // 55: memos.api.v1.MemoService.SetMemoAttachments:output_type -> google.protobuf.Empty
-	13, // 56: memos.api.v1.MemoService.ListMemoAttachments:output_type -> memos.api.v1.ListMemoAttachmentsResponse
-	48, // 57: memos.api.v1.MemoService.SetMemoRelations:output_type -> google.protobuf.Empty
-	17, // 58: memos.api.v1.MemoService.ListMemoRelations:output_type -> memos.api.v1.ListMemoRelationsResponse
-	3,  // 59: memos.api.v1.MemoService.CreateMemoComment:output_type -> memos.api.v1.Memo
-	20, // 60: memos.api.v1.MemoService.ListMemoComments:output_type -> memos.api.v1.ListMemoCommentsResponse
-	22, // 61: memos.api.v1.MemoService.ListMemoReactions:output_type -> memos.api.v1.ListMemoReactionsResponse
-	2,  // 62: memos.api.v1.MemoService.UpsertMemoReaction:output_type -> memos.api.v1.Reaction
-	48, // 63: memos.api.v1.MemoService.DeleteMemoReaction:output_type -> google.protobuf.Empty
-	26, // 64: memos.api.v1.MemoService.GenerateAiTags:output_type -> memos.api.v1.GenerateAiTagsResponse
-	28, // 65: memos.api.v1.MemoService.IndexMemo:output_type -> memos.api.v1.IndexMemoResponse
-	30, // 66: memos.api.v1.MemoService.DeleteMemoIndex:output_type -> memos.api.v1.DeleteMemoIndexResponse
-	32, // 67: memos.api.v1.MemoService.GetMemoIndexInfo:output_type -> memos.api.v1.MemoIndexInfo
-	34, // 68: memos.api.v1.MemoService.AiSearch:output_type -> memos.api.v1.AiSearchResponse
-	37, // 69: memos.api.v1.MemoService.RebuildIndex:output_type -> memos.api.v1.RebuildIndexResponse
-	39, // 70: memos.api.v1.MemoService.GetRebuildStatus:output_type -> memos.api.v1.RebuildTaskStatus
-	41, // 71: memos.api.v1.MemoService.AiHealthCheck:output_type -> memos.api.v1.AiHealthCheckResponse
-	50, // [50:72] is the sub-list for method output_type
-	28, // [28:50] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	33, // 27: memos.api.v1.MemoIndexInfo.detail:type_name -> memos.api.v1.MemoIndexDetail
+	34, // 28: memos.api.v1.MemoIndexDetail.text_chunks:type_name -> memos.api.v1.TextChunk
+	35, // 29: memos.api.v1.MemoIndexDetail.images:type_name -> memos.api.v1.ImageInfo
+	38, // 30: memos.api.v1.AiSearchResponse.results:type_name -> memos.api.v1.AiSearchResult
+	5,  // 31: memos.api.v1.MemoService.CreateMemo:input_type -> memos.api.v1.CreateMemoRequest
+	6,  // 32: memos.api.v1.MemoService.ListMemos:input_type -> memos.api.v1.ListMemosRequest
+	8,  // 33: memos.api.v1.MemoService.GetMemo:input_type -> memos.api.v1.GetMemoRequest
+	9,  // 34: memos.api.v1.MemoService.UpdateMemo:input_type -> memos.api.v1.UpdateMemoRequest
+	10, // 35: memos.api.v1.MemoService.DeleteMemo:input_type -> memos.api.v1.DeleteMemoRequest
+	11, // 36: memos.api.v1.MemoService.SetMemoAttachments:input_type -> memos.api.v1.SetMemoAttachmentsRequest
+	12, // 37: memos.api.v1.MemoService.ListMemoAttachments:input_type -> memos.api.v1.ListMemoAttachmentsRequest
+	15, // 38: memos.api.v1.MemoService.SetMemoRelations:input_type -> memos.api.v1.SetMemoRelationsRequest
+	16, // 39: memos.api.v1.MemoService.ListMemoRelations:input_type -> memos.api.v1.ListMemoRelationsRequest
+	18, // 40: memos.api.v1.MemoService.CreateMemoComment:input_type -> memos.api.v1.CreateMemoCommentRequest
+	19, // 41: memos.api.v1.MemoService.ListMemoComments:input_type -> memos.api.v1.ListMemoCommentsRequest
+	21, // 42: memos.api.v1.MemoService.ListMemoReactions:input_type -> memos.api.v1.ListMemoReactionsRequest
+	23, // 43: memos.api.v1.MemoService.UpsertMemoReaction:input_type -> memos.api.v1.UpsertMemoReactionRequest
+	24, // 44: memos.api.v1.MemoService.DeleteMemoReaction:input_type -> memos.api.v1.DeleteMemoReactionRequest
+	25, // 45: memos.api.v1.MemoService.GenerateAiTags:input_type -> memos.api.v1.GenerateAiTagsRequest
+	27, // 46: memos.api.v1.MemoService.IndexMemo:input_type -> memos.api.v1.IndexMemoRequest
+	29, // 47: memos.api.v1.MemoService.DeleteMemoIndex:input_type -> memos.api.v1.DeleteMemoIndexRequest
+	31, // 48: memos.api.v1.MemoService.GetMemoIndexInfo:input_type -> memos.api.v1.GetMemoIndexInfoRequest
+	36, // 49: memos.api.v1.MemoService.AiSearch:input_type -> memos.api.v1.AiSearchRequest
+	39, // 50: memos.api.v1.MemoService.RebuildIndex:input_type -> memos.api.v1.RebuildIndexRequest
+	41, // 51: memos.api.v1.MemoService.GetRebuildStatus:input_type -> memos.api.v1.GetRebuildStatusRequest
+	43, // 52: memos.api.v1.MemoService.AiHealthCheck:input_type -> memos.api.v1.AiHealthCheckRequest
+	3,  // 53: memos.api.v1.MemoService.CreateMemo:output_type -> memos.api.v1.Memo
+	7,  // 54: memos.api.v1.MemoService.ListMemos:output_type -> memos.api.v1.ListMemosResponse
+	3,  // 55: memos.api.v1.MemoService.GetMemo:output_type -> memos.api.v1.Memo
+	3,  // 56: memos.api.v1.MemoService.UpdateMemo:output_type -> memos.api.v1.Memo
+	51, // 57: memos.api.v1.MemoService.DeleteMemo:output_type -> google.protobuf.Empty
+	51, // 58: memos.api.v1.MemoService.SetMemoAttachments:output_type -> google.protobuf.Empty
+	13, // 59: memos.api.v1.MemoService.ListMemoAttachments:output_type -> memos.api.v1.ListMemoAttachmentsResponse
+	51, // 60: memos.api.v1.MemoService.SetMemoRelations:output_type -> google.protobuf.Empty
+	17, // 61: memos.api.v1.MemoService.ListMemoRelations:output_type -> memos.api.v1.ListMemoRelationsResponse
+	3,  // 62: memos.api.v1.MemoService.CreateMemoComment:output_type -> memos.api.v1.Memo
+	20, // 63: memos.api.v1.MemoService.ListMemoComments:output_type -> memos.api.v1.ListMemoCommentsResponse
+	22, // 64: memos.api.v1.MemoService.ListMemoReactions:output_type -> memos.api.v1.ListMemoReactionsResponse
+	2,  // 65: memos.api.v1.MemoService.UpsertMemoReaction:output_type -> memos.api.v1.Reaction
+	51, // 66: memos.api.v1.MemoService.DeleteMemoReaction:output_type -> google.protobuf.Empty
+	26, // 67: memos.api.v1.MemoService.GenerateAiTags:output_type -> memos.api.v1.GenerateAiTagsResponse
+	28, // 68: memos.api.v1.MemoService.IndexMemo:output_type -> memos.api.v1.IndexMemoResponse
+	30, // 69: memos.api.v1.MemoService.DeleteMemoIndex:output_type -> memos.api.v1.DeleteMemoIndexResponse
+	32, // 70: memos.api.v1.MemoService.GetMemoIndexInfo:output_type -> memos.api.v1.MemoIndexInfo
+	37, // 71: memos.api.v1.MemoService.AiSearch:output_type -> memos.api.v1.AiSearchResponse
+	40, // 72: memos.api.v1.MemoService.RebuildIndex:output_type -> memos.api.v1.RebuildIndexResponse
+	42, // 73: memos.api.v1.MemoService.GetRebuildStatus:output_type -> memos.api.v1.RebuildTaskStatus
+	44, // 74: memos.api.v1.MemoService.AiHealthCheck:output_type -> memos.api.v1.AiHealthCheckResponse
+	53, // [53:75] is the sub-list for method output_type
+	31, // [31:53] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_memo_service_proto_init() }
@@ -3212,7 +3433,7 @@ func file_api_v1_memo_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_memo_service_proto_rawDesc), len(file_api_v1_memo_service_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   42,
+			NumMessages:   45,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
